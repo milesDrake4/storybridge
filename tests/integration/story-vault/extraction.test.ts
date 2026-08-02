@@ -92,9 +92,16 @@ function vaultRepository(
 ): StoryVaultRepository {
   return {
     create: vi.fn().mockResolvedValue({ profile, type: "CREATED" }),
+    deleteFact: vi.fn().mockResolvedValue(true),
     findById: vi.fn().mockResolvedValue(profile),
     findBySession: vi.fn().mockResolvedValue(null),
+    getCurrent: vi.fn().mockResolvedValue(null),
+    getFactsForAi: vi.fn().mockResolvedValue([]),
     getInterview: vi.fn().mockResolvedValue(transcript),
+    suppressFact: vi.fn(),
+    updateFact: vi.fn(),
+    updateProfile: vi.fn(),
+    verifyFact: vi.fn(),
     ...overrides,
   };
 }
