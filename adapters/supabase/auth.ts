@@ -11,6 +11,10 @@ import { magicLinkRequestSchema } from "@/contracts/http/v1/auth";
 import type { ServerConfig } from "@/lib/config/server";
 import { createEmailHmac } from "@/lib/security/hmac";
 import type { CompleteMagicLinkDependencies } from "@/services/auth/complete-magic-link";
+import {
+  EligibilityError,
+  type AuthenticatedSession,
+} from "@/services/auth/eligibility";
 import type {
   MagicLinkRateLimit,
   RequestMagicLinkDependencies,
@@ -130,6 +134,32 @@ export function createSupabaseCompleteMagicLinkDependencies(
           .gt("expires_at", new Date().toISOString());
         if (error) throw error;
       },
+    },
+  };
+}
+
+export function createSupabaseAuthenticatedSession(
+  config: ServerConfig,
+  cookies: CookieMethodsServer,
+): AuthenticatedSession {
+  const client = createSupabaseSessionClient(config, cookies);
+  return {
+    async requireUserId() {
+      const { data, error } = await client.auth.getClaims();
+      if (error) {
+        throw new EligibilityError(
+          error.name === "AuthSessionMissingError"
+            ? "AUTH_REQUIRED"
+            : "SESSION_EXPIRED",
+        );
+      }
+      const userId = userIdSchema.safeParse(data?.claims?.sub);
+      if (!userId.success) {
+        throw new EligibilityError(
+          data?.claims ? "SESSION_EXPIRED" : "AUTH_REQUIRED",
+        );
+      }
+      return userId.data;
     },
   };
 }

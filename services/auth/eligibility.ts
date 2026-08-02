@@ -1,6 +1,7 @@
 import type { UserId } from "@/contracts/domain/ids";
 import type { ConsentInput, Profile } from "@/contracts/http/v1/me";
 import type { ErrorCode } from "@/contracts/http/v1/errors";
+import type { ProfileRepository } from "@/repositories/profile-repository";
 
 export const CURRENT_POLICY_VERSIONS = {
   privacyVersion: "privacy-2026-08-02",
@@ -31,22 +32,8 @@ export type AuthenticatedSession = {
   requireUserId(): Promise<UserId>;
 };
 
-export type EligibilityState = {
-  hasAcceptedInvitation: boolean;
-  profile: Profile | null;
-};
-
-export type ProfileEligibilityRepository = {
-  getEligibility(userId: UserId): Promise<EligibilityState>;
-  recordConsent(
-    userId: UserId,
-    input: ConsentInput,
-    now: Date,
-  ): Promise<Profile>;
-};
-
 export type EligibilityDependencies = {
-  profiles: ProfileEligibilityRepository;
+  profiles: ProfileRepository;
   session: AuthenticatedSession;
 };
 
