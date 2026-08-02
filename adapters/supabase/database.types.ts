@@ -51,6 +51,36 @@ export type Database = {
         };
         Relationships: [];
       };
+      auth_request_limits: {
+        Row: {
+          created_at: string;
+          key_hmac: string;
+          request_count: number;
+          scope: string;
+          updated_at: string;
+          window_end: string;
+          window_start: string;
+        };
+        Insert: {
+          created_at?: string;
+          key_hmac: string;
+          request_count?: number;
+          scope: string;
+          updated_at?: string;
+          window_end: string;
+          window_start: string;
+        };
+        Update: {
+          created_at?: string;
+          key_hmac?: string;
+          request_count?: number;
+          scope?: string;
+          updated_at?: string;
+          window_end?: string;
+          window_start?: string;
+        };
+        Relationships: [];
+      };
       beta_cohort_state: {
         Row: {
           accepted_count: number;
@@ -78,6 +108,7 @@ export type Database = {
           created_at: string;
           expires_at: string;
           id: string;
+          invite_token_hmac: string | null;
           normalized_email_hmac: string;
           status: string;
           updated_at: string;
@@ -87,6 +118,7 @@ export type Database = {
           created_at?: string;
           expires_at: string;
           id?: string;
+          invite_token_hmac?: string | null;
           normalized_email_hmac: string;
           status?: string;
           updated_at?: string;
@@ -96,6 +128,7 @@ export type Database = {
           created_at?: string;
           expires_at?: string;
           id?: string;
+          invite_token_hmac?: string | null;
           normalized_email_hmac?: string;
           status?: string;
           updated_at?: string;
@@ -107,7 +140,20 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      consume_auth_request_limit: {
+        Args: {
+          requested_at?: string;
+          requested_key_hmac: string;
+          requested_limit: number;
+          requested_scope: string;
+        };
+        Returns: {
+          allowed: boolean;
+          limit_value: number;
+          remaining: number;
+          reset_at: string;
+        }[];
+      };
     };
     Enums: {
       [_ in never]: never;
