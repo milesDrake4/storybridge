@@ -154,6 +154,23 @@ export type Database = {
           reset_at: string;
         }[];
       };
+      record_profile_consent: {
+        Args: {
+          requested_at?: string;
+          requested_birth_year: number;
+          requested_privacy_version: string;
+          requested_responsible_use_version: string;
+          requested_terms_version: string;
+          requested_user_id: string;
+        };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"][];
+        SetofOptions: {
+          from: "*";
+          to: "profiles";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
     };
     Enums: {
       [_ in never]: never;
