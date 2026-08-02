@@ -6,7 +6,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 ## Slice 0: Runnable foundation
 
 - [x] 1. Scaffold the pinned web runtime
-- [ ] 2. Install deterministic test harnesses
+- [x] 2. Install deterministic test harnesses
 - [ ] 3. Implement the canonical HTTP contract package
 - [ ] 4. Add validated configuration and security primitives
 - [ ] Checkpoint 0: Foundation green
