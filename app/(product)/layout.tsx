@@ -1,0 +1,52 @@
+import { cookies } from "next/headers";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import type { ReactNode } from "react";
+
+import { createSupabaseAuthenticatedSession } from "@/adapters/supabase/auth";
+import { toSupabaseCookieMethods } from "@/adapters/supabase/next-cookies";
+import { createSupabaseProfileRepository } from "@/adapters/supabase/profile-repository";
+import { parseServerConfig } from "@/lib/config/server";
+import { productAccessRedirect } from "@/services/auth/access-navigation";
+import { requireProductEligibility } from "@/services/auth/eligibility";
+
+export const dynamic = "force-dynamic";
+
+export default async function ProductLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const config = parseServerConfig(process.env);
+  const cookieMethods = toSupabaseCookieMethods(await cookies());
+
+  try {
+    await requireProductEligibility({
+      profiles: createSupabaseProfileRepository(config),
+      session: createSupabaseAuthenticatedSession(config, cookieMethods),
+    });
+  } catch (error) {
+    const destination = productAccessRedirect(error);
+    if (destination) redirect(destination);
+    throw error;
+  }
+
+  return (
+    <div className="product-shell">
+      <header className="product-header">
+        <Link className="wordmark" href="/dashboard">
+          StoryBridge
+        </Link>
+        <span className="beta-badge">Closed beta</span>
+      </header>
+      <div className="product-grid">
+        <nav className="product-nav" aria-label="Workspace">
+          <Link aria-current="page" href="/dashboard">
+            Dashboard
+          </Link>
+        </nav>
+        <main className="product-main">{children}</main>
+      </div>
+    </div>
+  );
+}
