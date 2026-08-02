@@ -13,7 +13,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 ## Slice 1: Invited adult access
 
-- [ ] 5. Create the local Supabase ownership baseline
+- [x] 5. Create the local Supabase ownership baseline
 - [ ] 6. Deliver uniform magic-link request and callback APIs
 - [ ] 7. Enforce consent and beta eligibility
 - [ ] 8. Build sign-in, consent, and authenticated shell UI
