@@ -51,6 +51,87 @@ export type Database = {
         };
         Relationships: [];
       };
+      ai_operations: {
+        Row: {
+          completed_at: string | null;
+          created_at: string;
+          essay_id: string | null;
+          estimated_cost_cents: number;
+          final_cost_cents: number | null;
+          id: string;
+          idempotency_key_hmac: string;
+          input_tokens: number | null;
+          latency_ms: number | null;
+          method: string;
+          model_id: string | null;
+          original_http_status: number | null;
+          output_tokens: number | null;
+          provider_request_id: string | null;
+          provider_started_at: string | null;
+          purpose: string;
+          request_hmac: string | null;
+          result_resource_id: string | null;
+          result_resource_type: string | null;
+          route: string;
+          safe_error_code: string | null;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          created_at?: string;
+          essay_id?: string | null;
+          estimated_cost_cents: number;
+          final_cost_cents?: number | null;
+          id?: string;
+          idempotency_key_hmac: string;
+          input_tokens?: number | null;
+          latency_ms?: number | null;
+          method: string;
+          model_id?: string | null;
+          original_http_status?: number | null;
+          output_tokens?: number | null;
+          provider_request_id?: string | null;
+          provider_started_at?: string | null;
+          purpose: string;
+          request_hmac?: string | null;
+          result_resource_id?: string | null;
+          result_resource_type?: string | null;
+          route: string;
+          safe_error_code?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          created_at?: string;
+          essay_id?: string | null;
+          estimated_cost_cents?: number;
+          final_cost_cents?: number | null;
+          id?: string;
+          idempotency_key_hmac?: string;
+          input_tokens?: number | null;
+          latency_ms?: number | null;
+          method?: string;
+          model_id?: string | null;
+          original_http_status?: number | null;
+          output_tokens?: number | null;
+          provider_request_id?: string | null;
+          provider_started_at?: string | null;
+          purpose?: string;
+          request_hmac?: string | null;
+          result_resource_id?: string | null;
+          result_resource_type?: string | null;
+          route?: string;
+          safe_error_code?: string | null;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       auth_request_limits: {
         Row: {
           created_at: string;
@@ -135,6 +216,68 @@ export type Database = {
         };
         Relationships: [];
       };
+      usage_reservations: {
+        Row: {
+          budget_month_start: string;
+          created_at: string;
+          estimated_cost_cents: number;
+          expires_at: string;
+          final_cost_cents: number | null;
+          final_units: number | null;
+          finalized_at: string | null;
+          ip_hmac: string;
+          operation_id: string;
+          quota_window_end: string;
+          quota_window_start: string;
+          released_at: string | null;
+          reserved_units: number;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          budget_month_start: string;
+          created_at?: string;
+          estimated_cost_cents: number;
+          expires_at: string;
+          final_cost_cents?: number | null;
+          final_units?: number | null;
+          finalized_at?: string | null;
+          ip_hmac: string;
+          operation_id: string;
+          quota_window_end: string;
+          quota_window_start: string;
+          released_at?: string | null;
+          reserved_units?: number;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          budget_month_start?: string;
+          created_at?: string;
+          estimated_cost_cents?: number;
+          expires_at?: string;
+          final_cost_cents?: number | null;
+          final_units?: number | null;
+          finalized_at?: string | null;
+          ip_hmac?: string;
+          operation_id?: string;
+          quota_window_end?: string;
+          quota_window_start?: string;
+          released_at?: string | null;
+          reserved_units?: number;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "usage_reservations_operation_owner_fkey";
+            columns: ["user_id", "operation_id"];
+            isOneToOne: false;
+            referencedRelation: "ai_operations";
+            referencedColumns: ["user_id", "id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -154,6 +297,24 @@ export type Database = {
           reset_at: string;
         }[];
       };
+      finalize_ai_operation: {
+        Args: {
+          requested_at?: string;
+          requested_final_cost_cents: number;
+          requested_http_status: number;
+          requested_input_tokens: number;
+          requested_latency_ms: number;
+          requested_model_id: string | null;
+          requested_operation_id: string;
+          requested_output_tokens: number;
+          requested_provider_request_id: string | null;
+          requested_result_resource_id: string | null;
+          requested_result_resource_type: string | null;
+          requested_safe_error_code: string | null;
+          requested_status: string;
+        };
+        Returns: boolean;
+      };
       record_profile_consent: {
         Args: {
           requested_at?: string;
@@ -170,6 +331,45 @@ export type Database = {
           isOneToOne: false;
           isSetofReturn: true;
         };
+      };
+      release_ai_operation: {
+        Args: {
+          requested_at?: string;
+          requested_http_status: number;
+          requested_operation_id: string;
+          requested_safe_error_code: string;
+        };
+        Returns: boolean;
+      };
+      reserve_ai_operation: {
+        Args: {
+          requested_at?: string;
+          requested_beta_account_cap: number;
+          requested_daily_limit: number;
+          requested_essay_id: string | null;
+          requested_estimated_cost_cents: number;
+          requested_idempotency_key_hmac: string;
+          requested_ip_hmac: string;
+          requested_method: string;
+          requested_monthly_budget_cents: number;
+          requested_purpose: string;
+          requested_request_hmac: string;
+          requested_route: string;
+          requested_user_id: string;
+        };
+        Returns: {
+          decision: string;
+          operation_id: string | null;
+          operation_status: string | null;
+          original_http_status: number | null;
+          reset_at: string;
+          result_resource_id: string | null;
+          result_resource_type: string | null;
+        }[];
+      };
+      start_ai_operation: {
+        Args: { requested_at?: string; requested_operation_id: string };
+        Returns: string;
       };
     };
     Enums: {
