@@ -14,6 +14,7 @@ const MODERATION_MODEL = "omni-moderation-latest";
 const MODERATION_TIMEOUT_MS = 15_000;
 
 const moderationResponseSchema = z.object({
+  id: z.string().min(1),
   model: z.string().min(1),
   results: z
     .array(
@@ -39,6 +40,7 @@ function normalizeModeration(response: unknown): ModerationSignal {
       .sort(),
     flagged: result.flagged,
     model: parsed.data.model,
+    requestId: parsed.data.id,
     scores: result.category_scores,
   };
 }

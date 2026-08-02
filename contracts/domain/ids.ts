@@ -15,3 +15,11 @@ export type EssayId = z.infer<typeof essayIdSchema>;
 
 export const aiOperationIdSchema = canonicalUuidSchema.brand<"AiOperationId">();
 export type AiOperationId = z.infer<typeof aiOperationIdSchema>;
+
+export const interviewSessionIdSchema =
+  canonicalUuidSchema.brand<"InterviewSessionId">();
+export type InterviewSessionId = z.infer<typeof interviewSessionIdSchema>;
+
+export const interviewMessageIdSchema =
+  canonicalUuidSchema.brand<"InterviewMessageId">();
+export type InterviewMessageId = z.infer<typeof interviewMessageIdSchema>;

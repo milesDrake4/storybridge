@@ -130,6 +130,7 @@ describe("OpenAI adapter", () => {
       categories: ["self-harm", "self-harm/intent"],
       flagged: true,
       model: "omni-moderation-latest",
+      requestId: "modr_synthetic_signal",
       scores: {
         "self-harm": 0.91,
         "self-harm/intent": 0.88,

@@ -23,7 +23,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 - [x] 9. Establish the provider-neutral AI adapter boundary
 - [x] 10. Reserve AI usage atomically before provider calls
-- [ ] 11. Persist and serve resumable interview turns
+- [x] 11. Persist and serve resumable interview turns
 - [ ] 12. Build the resumable interview UI
 - [ ] 13. Extract a source-linked unverified Story Vault
 - [ ] 14. Deliver Story Vault review and privacy controls

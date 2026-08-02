@@ -15,8 +15,8 @@ provider request and response shapes.
   field, require `additionalProperties: false`, and can still return refusals
   or incomplete output; see the official
   [Structured Outputs guide](https://developers.openai.com/api/docs/guides/structured-outputs).
-- Moderation uses `omni-moderation-latest` and normalizes only the flag,
-  category names, and scores into the domain port. Application policy—not a
+- Moderation uses `omni-moderation-latest` and normalizes only the provider
+  request ID, model, flag, category names, and scores into the domain port. Application policy—not a
   raw score alone—decides the user experience, following the official
   [Moderation guide](https://developers.openai.com/api/docs/guides/moderation).
 - The SDK defaults to two retries and a ten-minute timeout. StoryBridge still
