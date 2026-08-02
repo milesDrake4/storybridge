@@ -55,13 +55,13 @@ export type AiOperationReservation =
 export type FinalizeAiOperationRecord = {
   finalCostCents: number;
   httpStatus: number;
-  inputTokens: number;
+  inputTokens: number | null;
   latencyMs: number;
-  modelId: string;
+  modelId: string | null;
   now: Date;
   operationId: AiOperationId;
-  outputTokens: number;
-  providerRequestId: string;
+  outputTokens: number | null;
+  providerRequestId: string | null;
   safeErrorCode?: string;
   status: "SUCCEEDED" | "FAILED" | "REFUSED" | "UNKNOWN";
   resource?: { id: string; type: string };

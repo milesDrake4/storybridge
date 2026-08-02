@@ -216,6 +216,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      interview_questions: {
+        Row: {
+          coverage_key: string;
+          position: number;
+          prompt: string;
+          question_key: string;
+        };
+        Insert: {
+          coverage_key: string;
+          position: number;
+          prompt: string;
+          question_key: string;
+        };
+        Update: {
+          coverage_key?: string;
+          position?: number;
+          prompt?: string;
+          question_key?: string;
+        };
+        Relationships: [];
+      };
       usage_reservations: {
         Row: {
           budget_month_start: string;
@@ -302,11 +323,11 @@ export type Database = {
           requested_at?: string;
           requested_final_cost_cents: number;
           requested_http_status: number;
-          requested_input_tokens: number;
+          requested_input_tokens: number | null;
           requested_latency_ms: number;
           requested_model_id: string | null;
           requested_operation_id: string;
-          requested_output_tokens: number;
+          requested_output_tokens: number | null;
           requested_provider_request_id: string | null;
           requested_result_resource_id: string | null;
           requested_result_resource_type: string | null;
@@ -331,6 +352,16 @@ export type Database = {
           isOneToOne: false;
           isSetofReturn: true;
         };
+      };
+      record_interview_answer: {
+        Args: {
+          requested_answer: string;
+          requested_at?: string;
+          requested_question_key: string;
+          requested_session_id: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
       };
       release_ai_operation: {
         Args: {
@@ -371,6 +402,10 @@ export type Database = {
         Args: { requested_at?: string; requested_operation_id: string };
         Returns: string;
       };
+      start_interview_session: {
+        Args: { requested_at?: string; requested_user_id: string };
+        Returns: Json;
+      };
     };
     Enums: {
       [_ in never]: never;
@@ -381,6 +416,83 @@ export type Database = {
   };
   public: {
     Tables: {
+      interview_messages: {
+        Row: {
+          content: string;
+          created_at: string;
+          id: string;
+          question_key: string;
+          role: string;
+          sequence: number;
+          session_id: string;
+          user_id: string;
+        };
+        Insert: {
+          content: string;
+          created_at?: string;
+          id?: string;
+          question_key: string;
+          role: string;
+          sequence: number;
+          session_id: string;
+          user_id: string;
+        };
+        Update: {
+          content?: string;
+          created_at?: string;
+          id?: string;
+          question_key?: string;
+          role?: string;
+          sequence?: number;
+          session_id?: string;
+          user_id?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "interview_messages_session_owner_fkey";
+            columns: ["user_id", "session_id"];
+            isOneToOne: false;
+            referencedRelation: "interview_sessions";
+            referencedColumns: ["user_id", "id"];
+          },
+        ];
+      };
+      interview_sessions: {
+        Row: {
+          completed_at: string | null;
+          coverage: Json;
+          created_at: string;
+          current_question_key: string | null;
+          id: string;
+          next_sequence: number;
+          status: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          completed_at?: string | null;
+          coverage?: Json;
+          created_at?: string;
+          current_question_key?: string | null;
+          id?: string;
+          next_sequence?: number;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: {
+          completed_at?: string | null;
+          coverage?: Json;
+          created_at?: string;
+          current_question_key?: string | null;
+          id?: string;
+          next_sequence?: number;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       profiles: {
         Row: {
           age_confirmed_at: string;

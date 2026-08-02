@@ -57,6 +57,7 @@ export type ModerationSignal = {
   categories: string[];
   flagged: boolean;
   model: string;
+  requestId: string;
   scores: Record<string, number>;
 };
 
