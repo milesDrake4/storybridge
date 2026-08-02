@@ -1,12 +1,11 @@
-import {
-  createServerClient,
-  type CookieMethodsServer,
-  type CookieOptions,
-} from "@supabase/ssr";
-import { createClient } from "@supabase/supabase-js";
+import type { CookieMethodsServer } from "@supabase/ssr";
 import { z } from "zod";
 
-import type { Database } from "@/adapters/supabase/database.types";
+import {
+  createSupabasePublicClient,
+  createSupabaseSecretClient,
+  createSupabaseSessionClient,
+} from "@/adapters/supabase/client";
 import { userIdSchema } from "@/contracts/domain/ids";
 import { magicLinkRequestSchema } from "@/contracts/http/v1/auth";
 import type { ServerConfig } from "@/lib/config/server";
@@ -32,41 +31,11 @@ const authIdentitySchema = z.object({
   id: userIdSchema,
 });
 
-export function supabaseAuthCookieOptions(appUrl: URL): CookieOptions {
-  return {
-    httpOnly: true,
-    path: "/",
-    sameSite: "lax",
-    secure: appUrl.protocol === "https:",
-  };
-}
-
-function clients(config: ServerConfig) {
-  const options = {
-    auth: {
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-      persistSession: false,
-    },
-  } as const;
-  return {
-    publicClient: createClient<Database>(
-      config.supabaseUrl.href,
-      config.supabasePublishableKey,
-      options,
-    ),
-    secretClient: createClient<Database>(
-      config.supabaseUrl.href,
-      config.supabaseSecretKey,
-      options,
-    ),
-  };
-}
-
 export function createSupabaseMagicLinkDependencies(
   config: ServerConfig,
 ): RequestMagicLinkDependencies {
-  const { publicClient, secretClient } = clients(config);
+  const publicClient = createSupabasePublicClient(config);
+  const secretClient = createSupabaseSecretClient(config);
 
   async function consume(
     scope: "EMAIL" | "IP",
@@ -129,12 +98,8 @@ export function createSupabaseCompleteMagicLinkDependencies(
   config: ServerConfig,
   cookies: CookieMethodsServer,
 ): CompleteMagicLinkDependencies {
-  const sessionClient = createServerClient<Database>(
-    config.supabaseUrl.href,
-    config.supabasePublishableKey,
-    { cookieOptions: supabaseAuthCookieOptions(config.appUrl), cookies },
-  );
-  const { secretClient } = clients(config);
+  const sessionClient = createSupabaseSessionClient(config, cookies);
+  const secretClient = createSupabaseSecretClient(config);
 
   return {
     exchange: {

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { supabaseAuthCookieOptions } from "@/adapters/supabase/auth";
+import { supabaseAuthCookieOptions } from "@/adapters/supabase/client";
 import { createAuthCallbackGetHandler } from "@/app/api/v1/auth/callback/handler";
 import { createMagicLinkPostHandler } from "@/app/api/v1/auth/magic-links/handler";
 import {
