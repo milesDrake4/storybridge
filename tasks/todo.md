@@ -15,7 +15,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 - [x] 5. Create the local Supabase ownership baseline
 - [x] 6. Deliver uniform magic-link request and callback APIs
-- [ ] 7. Enforce consent and beta eligibility
+- [x] 7. Enforce consent and beta eligibility
 - [ ] 8. Build sign-in, consent, and authenticated shell UI
 - [ ] Checkpoint 1: Invited access green
 
