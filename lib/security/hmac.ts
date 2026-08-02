@@ -9,6 +9,7 @@ type PurposeHmac<Purpose extends string> = string & {
 };
 
 export type IpHmac = PurposeHmac<"IP">;
+export type EmailHmac = PurposeHmac<"EMAIL">;
 export type ContentHmac = PurposeHmac<"CONTENT">;
 export type IdempotencyHmac = PurposeHmac<"IDEMPOTENCY">;
 
@@ -25,6 +26,13 @@ function createPurposeHmac<Purpose extends string>(
 
 export function createIpHmac(value: string, secrets: HmacSecrets): IpHmac {
   return createPurposeHmac("IP", value, secrets.ip);
+}
+
+export function createEmailHmac(
+  value: string,
+  secrets: HmacSecrets,
+): EmailHmac {
+  return createPurposeHmac("EMAIL", value, secrets.idempotency);
 }
 
 export function createContentHmac(
