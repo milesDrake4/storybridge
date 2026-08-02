@@ -4,8 +4,12 @@ import type {
   UserId,
 } from "@/contracts/domain/ids";
 import type {
+  StoryFact,
+  StoryFactPatch,
   StoryFactCategory,
   StoryProfile,
+  StoryProfilePatch,
+  StoryProfileWithFacts,
   VoiceProfile,
 } from "@/contracts/domain/story-vault";
 import type { InterviewSessionWithMessages } from "@/contracts/http/v1/interviews";
@@ -23,6 +27,10 @@ export type CreateStoryProfileDecision =
   | { profile: StoryProfile; type: "CREATED" | "REPLAY" }
   | { type: "INCOMPLETE" | "INSUFFICIENT_COVERAGE" | "NOT_FOUND" };
 
+export type StoryMutationDecision<Value> =
+  | { type: "NOT_FOUND" | "REVISION_MISMATCH" }
+  | { type: "REPLAY" | "UPDATED"; value: Value };
+
 export interface StoryVaultRepository {
   create(input: {
     facts: PersistedStoryFactInput[];
@@ -39,8 +47,40 @@ export interface StoryVaultRepository {
     userId: UserId,
     sessionId: InterviewSessionId,
   ): Promise<StoryProfile | null>;
+  getCurrent(userId: UserId): Promise<StoryProfileWithFacts | null>;
   getInterview(
     userId: UserId,
     sessionId: InterviewSessionId,
   ): Promise<InterviewSessionWithMessages | null>;
+  updateProfile(input: {
+    expectedRevision: number;
+    now: Date;
+    patch: StoryProfilePatch;
+    profileId: StoryProfileId;
+    userId: UserId;
+  }): Promise<StoryMutationDecision<StoryProfile>>;
+  updateFact(input: {
+    contentHmac: ContentHmac;
+    expectedRevision: number;
+    factId: string;
+    now: Date;
+    patch: StoryFactPatch;
+    userId: UserId;
+  }): Promise<StoryMutationDecision<StoryFact>>;
+  verifyFact(input: {
+    contentHmac: string;
+    decision: "VERIFY" | "REJECT";
+    expectedRevision: number;
+    factId: string;
+    now: Date;
+    userId: UserId;
+  }): Promise<StoryMutationDecision<StoryFact>>;
+  suppressFact(input: {
+    factId: string;
+    now: Date;
+    suppressed: boolean;
+    userId: UserId;
+  }): Promise<StoryMutationDecision<StoryFact>>;
+  deleteFact(userId: UserId, factId: string): Promise<boolean>;
+  getFactsForAi(userId: UserId): Promise<StoryFact[]>;
 }

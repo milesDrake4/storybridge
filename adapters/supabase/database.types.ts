@@ -327,6 +327,20 @@ export type Database = {
         };
         Returns: Json;
       };
+      delete_story_fact: {
+        Args: { requested_fact_id: string; requested_user_id: string };
+        Returns: boolean;
+      };
+      get_story_facts_for_ai: {
+        Args: { requested_user_id: string };
+        Returns: Database["public"]["Tables"]["story_facts"]["Row"][];
+        SetofOptions: {
+          from: "*";
+          to: "story_facts";
+          isOneToOne: false;
+          isSetofReturn: true;
+        };
+      };
       finalize_ai_operation: {
         Args: {
           requested_at?: string;
@@ -372,6 +386,26 @@ export type Database = {
         };
         Returns: Json;
       };
+      set_story_fact_suppression: {
+        Args: {
+          requested_at?: string;
+          requested_fact_id: string;
+          requested_suppressed: boolean;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
+      set_story_fact_verification: {
+        Args: {
+          requested_at?: string;
+          requested_content_hmac: string;
+          requested_decision: string;
+          requested_expected_revision: number;
+          requested_fact_id: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       release_ai_operation: {
         Args: {
           requested_at?: string;
@@ -413,6 +447,29 @@ export type Database = {
       };
       start_interview_session: {
         Args: { requested_at?: string; requested_user_id: string };
+        Returns: Json;
+      };
+      update_story_fact: {
+        Args: {
+          requested_at?: string;
+          requested_content_hmac: string;
+          requested_details: Json;
+          requested_expected_revision: number;
+          requested_fact_id: string;
+          requested_summary: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
+      update_story_profile: {
+        Args: {
+          requested_at?: string;
+          requested_excluded_topics: Json | null;
+          requested_expected_revision: number;
+          requested_profile_id: string;
+          requested_user_id: string;
+          requested_voice_profile: Json | null;
+        };
         Returns: Json;
       };
     };

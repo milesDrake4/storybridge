@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(18);
+select plan(28);
 
 select has_table('public', 'story_profiles', 'story profiles table exists');
 select has_table('public', 'story_facts', 'story facts table exists');
@@ -141,9 +141,94 @@ select is(
 );
 select is((select count(*) from public.story_profiles), 1::bigint, 'replay creates no duplicate profile');
 
+create temp table academic_fact as
+select id, content_hmac from public.story_facts where category = 'ACADEMICS';
+
+select is(
+  private.set_story_fact_verification(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact), 1, (select content_hmac from academic_fact),
+    'VERIFY', '2026-08-02T16:00:13Z'
+  ) #>> '{fact,verification_status}',
+  'VERIFIED',
+  'verification binds to the current fact content'
+);
+select is((select revision from public.story_facts where id = (select id from academic_fact)), 2, 'verification advances the fact revision');
+
+select is(
+  private.update_story_fact(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact), 2, 'Edited academic summary',
+    '["Edited synthetic detail"]'::jsonb,
+    'v1.CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    '2026-08-02T16:00:14Z'
+  ) #>> '{fact,verification_status}',
+  'UNVERIFIED',
+  'editing atomically un-verifies a fact'
+);
+select is(
+  private.set_story_fact_verification(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact), 2, (select content_hmac from academic_fact),
+    'VERIFY', '2026-08-02T16:00:15Z'
+  ) ->> 'decision',
+  'REVISION_MISMATCH',
+  'stale unseen content cannot be verified'
+);
+select is(
+  private.set_story_fact_verification(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact), 3,
+    'v1.CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    'VERIFY', '2026-08-02T16:00:16Z'
+  ) ->> 'decision',
+  'UPDATED',
+  'the current edited content can be verified explicitly'
+);
+
+update public.story_profiles set status = 'ACTIVE';
+select is(
+  (select count(*) from private.get_story_facts_for_ai('a0000000-0000-4000-8000-000000000001')),
+  1::bigint,
+  'AI context includes only active verified facts'
+);
+select is(
+  private.set_story_fact_suppression(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact), true, '2026-08-02T16:00:17Z'
+  ) ->> 'decision',
+  'UPDATED',
+  'a fact can be suppressed'
+);
+select is(
+  (select count(*) from private.get_story_facts_for_ai('a0000000-0000-4000-8000-000000000001')),
+  0::bigint,
+  'suppressed facts are excluded by the repository query'
+);
+select is(
+  private.set_story_fact_suppression(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact), true, '2026-08-02T16:00:18Z'
+  ) ->> 'decision',
+  'REPLAY',
+  'suppression replay is idempotent'
+);
+
+select ok(
+  private.delete_story_fact(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact)
+  )
+  and not private.delete_story_fact(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact)
+  ),
+  'fact deletion removes the fact once and then safely replays'
+);
+
 set local role authenticated;
 set local request.jwt.claim.sub = 'a0000000-0000-4000-8000-000000000001';
-select is((select count(*) from public.story_facts), 2::bigint, 'the owner can review extracted facts');
+select is((select count(*) from public.story_facts), 1::bigint, 'the owner can review remaining extracted facts');
 set local request.jwt.claim.sub = 'a0000000-0000-4000-8000-000000000002';
 select is((select count(*) from public.story_facts), 0::bigint, 'another user cannot read extracted facts');
 reset role;

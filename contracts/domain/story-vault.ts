@@ -74,3 +74,54 @@ export const storyFactSchema = z.object({
   verifiedAt: rfc3339UtcSchema.nullable(),
 });
 export type StoryFact = z.infer<typeof storyFactSchema>;
+
+export const storyFactWithSourcesSchema = storyFactSchema.extend({
+  sources: z.array(
+    z.object({
+      content: z.string().min(1).max(4000),
+      id: interviewMessageIdSchema,
+      questionKey: z.string().min(1).max(64),
+    }),
+  ),
+});
+export type StoryFactWithSources = z.infer<typeof storyFactWithSourcesSchema>;
+
+export const storyProfileWithFactsSchema = z.object({
+  facts: z.array(storyFactWithSourcesSchema),
+  profile: storyProfileSchema,
+});
+export type StoryProfileWithFacts = z.infer<typeof storyProfileWithFactsSchema>;
+
+export const storyProfilePatchSchema = z
+  .strictObject({
+    excludedTopics: z
+      .array(z.string().trim().min(1).max(200))
+      .max(20)
+      .optional(),
+    voiceProfile: voiceProfileSchema.optional(),
+  })
+  .refine(
+    (value) =>
+      value.excludedTopics !== undefined || value.voiceProfile !== undefined,
+    "At least one profile field is required",
+  );
+export type StoryProfilePatch = z.infer<typeof storyProfilePatchSchema>;
+
+export const storyFactPatchSchema = z.strictObject({
+  details: z.array(z.string().trim().min(1).max(500)).min(1).max(10),
+  summary: z.string().trim().min(1).max(500),
+});
+export type StoryFactPatch = z.infer<typeof storyFactPatchSchema>;
+
+export const storyFactVerificationInputSchema = z.strictObject({
+  contentHash: z.string().regex(/^v[1-9][0-9]*\.[A-Za-z0-9_-]{43}$/),
+  decision: z.enum(["VERIFY", "REJECT"]),
+  expectedRevision: z.number().int().positive(),
+});
+export type StoryFactVerificationInput = z.infer<
+  typeof storyFactVerificationInputSchema
+>;
+
+export const storyFactSuppressionInputSchema = z.strictObject({
+  suppressed: z.boolean(),
+});
