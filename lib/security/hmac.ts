@@ -10,6 +10,7 @@ type PurposeHmac<Purpose extends string> = string & {
 
 export type IpHmac = PurposeHmac<"IP">;
 export type EmailHmac = PurposeHmac<"EMAIL">;
+export type InvitationTokenHmac = PurposeHmac<"INVITATION_TOKEN">;
 export type ContentHmac = PurposeHmac<"CONTENT">;
 export type IdempotencyHmac = PurposeHmac<"IDEMPOTENCY">;
 
@@ -24,8 +25,20 @@ function createPurposeHmac<Purpose extends string>(
   return `${ACTIVE_HMAC_KEY_VERSION}.${digest}` as PurposeHmac<Purpose>;
 }
 
-export function createIpHmac(value: string, secrets: HmacSecrets): IpHmac {
-  return createPurposeHmac("IP", value, secrets.ip);
+export function createIpHmac(
+  value: string,
+  secrets: HmacSecrets,
+  now = new Date(),
+): IpHmac {
+  const utcDay = now.toISOString().slice(0, 10);
+  return createPurposeHmac("IP", `${utcDay}:${value}`, secrets.ip);
+}
+
+export function createInvitationTokenHmac(
+  value: string,
+  secrets: HmacSecrets,
+): InvitationTokenHmac {
+  return createPurposeHmac("INVITATION_TOKEN", value, secrets.idempotency);
 }
 
 export function createEmailHmac(

@@ -2,7 +2,11 @@ import type {
   MagicLinkAccepted,
   MagicLinkRequest,
 } from "@/contracts/http/v1/auth";
-import type { EmailHmac, IpHmac } from "@/lib/security/hmac";
+import type {
+  EmailHmac,
+  InvitationTokenHmac,
+  IpHmac,
+} from "@/lib/security/hmac";
 
 export type RateLimitDecision = {
   allowed: boolean;
@@ -17,7 +21,10 @@ export type MagicLinkRateLimit = {
 };
 
 export type MagicLinkInvitationLookup = {
-  permitsSignup(email: EmailHmac, inviteToken?: string): Promise<boolean>;
+  permitsSignup(
+    email: EmailHmac,
+    inviteToken?: InvitationTokenHmac,
+  ): Promise<boolean>;
 };
 
 export type MagicLinkSender = {
@@ -38,12 +45,15 @@ export type RequestMagicLinkResult =
   | { type: "ACCEPTED"; value: MagicLinkAccepted }
   | { type: "RATE_LIMITED"; decision: RateLimitDecision };
 
+export type RequestMagicLinkInput = Omit<MagicLinkRequest, "inviteToken"> & {
+  emailHmac: EmailHmac;
+  inviteTokenHmac?: InvitationTokenHmac;
+  ipHmac: IpHmac;
+  redirectTo: string;
+};
+
 export async function requestMagicLink(
-  input: MagicLinkRequest & {
-    emailHmac: EmailHmac;
-    ipHmac: IpHmac;
-    redirectTo: string;
-  },
+  input: RequestMagicLinkInput,
   dependencies: RequestMagicLinkDependencies,
 ): Promise<RequestMagicLinkResult> {
   const [emailLimit, ipLimit] = await Promise.all([
@@ -60,7 +70,7 @@ export async function requestMagicLink(
 
   const shouldCreateUser = await dependencies.invitations.permitsSignup(
     input.emailHmac,
-    input.inviteToken,
+    input.inviteTokenHmac,
   );
 
   try {
