@@ -8,7 +8,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 - [x] 1. Scaffold the pinned web runtime
 - [x] 2. Install deterministic test harnesses
 - [x] 3. Implement the canonical HTTP contract package
-- [ ] 4. Add validated configuration and security primitives
+- [x] 4. Add validated configuration and security primitives
 - [ ] Checkpoint 0: Foundation green
 
 ## Slice 1: Invited adult access
