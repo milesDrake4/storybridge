@@ -23,3 +23,10 @@ export type InterviewSessionId = z.infer<typeof interviewSessionIdSchema>;
 export const interviewMessageIdSchema =
   canonicalUuidSchema.brand<"InterviewMessageId">();
 export type InterviewMessageId = z.infer<typeof interviewMessageIdSchema>;
+
+export const storyProfileIdSchema =
+  canonicalUuidSchema.brand<"StoryProfileId">();
+export type StoryProfileId = z.infer<typeof storyProfileIdSchema>;
+
+export const storyFactIdSchema = canonicalUuidSchema.brand<"StoryFactId">();
+export type StoryFactId = z.infer<typeof storyFactIdSchema>;

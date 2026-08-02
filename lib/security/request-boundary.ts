@@ -1,5 +1,8 @@
+import { isIP } from "node:net";
+
 import type { z } from "zod";
 
+import { idempotencyKeySchema } from "@/contracts/http/v1/common";
 import type { ErrorCode, ErrorHttpStatus } from "@/contracts/http/v1/errors";
 import {
   errorStatusByCode,
@@ -49,6 +52,26 @@ export function assertSameOriginMutation(request: Request, appUrl: URL): void {
   ) {
     throw new RequestBoundaryError("VALIDATION_ERROR");
   }
+}
+
+export function requireIdempotencyKey(request: Request): string {
+  const result = idempotencyKeySchema.safeParse(
+    request.headers.get("idempotency-key"),
+  );
+  if (!result.success) {
+    throw new RequestBoundaryError("IDEMPOTENCY_KEY_REQUIRED");
+  }
+  return result.data;
+}
+
+export function clientIpAddress(request: Request): string {
+  const forwarded =
+    request.headers.get("x-vercel-forwarded-for") ??
+    request.headers.get("x-forwarded-for")?.split(",", 1)[0];
+  const candidate = forwarded?.trim();
+  return candidate && candidate.length <= 128 && isIP(candidate)
+    ? candidate
+    : "0.0.0.0";
 }
 
 async function readBoundedBody(
