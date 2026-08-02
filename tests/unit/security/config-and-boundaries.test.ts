@@ -5,6 +5,7 @@ import { register } from "@/instrumentation";
 import { parseServerConfig } from "@/lib/config/server";
 import {
   createContentHmac,
+  createEmailHmac,
   createIdempotencyHmac,
   createIpHmac,
 } from "@/lib/security/hmac";
@@ -95,6 +96,9 @@ describe("purpose-separated HMACs", () => {
     expect(createIpHmac(input, keys)).toBe(createIpHmac(input, keys));
     expect(createIpHmac(input, keys)).not.toBe(createContentHmac(input, keys));
     expect(createContentHmac(input, keys)).not.toBe(
+      createIdempotencyHmac(input, keys),
+    );
+    expect(createEmailHmac(input, keys)).not.toBe(
       createIdempotencyHmac(input, keys),
     );
     expect(createIpHmac(input, keys)).toMatch(/^v1\.[A-Za-z0-9_-]{43}$/);
