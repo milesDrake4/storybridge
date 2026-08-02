@@ -41,9 +41,8 @@ export default async function ProductLayout({
       </header>
       <div className="product-grid">
         <nav className="product-nav" aria-label="Workspace">
-          <Link aria-current="page" href="/dashboard">
-            Dashboard
-          </Link>
+          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/interview">Interview</Link>
         </nav>
         <main className="product-main">{children}</main>
       </div>
