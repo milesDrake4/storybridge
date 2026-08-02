@@ -9,7 +9,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 - [x] 2. Install deterministic test harnesses
 - [x] 3. Implement the canonical HTTP contract package
 - [x] 4. Add validated configuration and security primitives
-- [ ] Checkpoint 0: Foundation green
+- [x] Checkpoint 0: Foundation green
 
 ## Slice 1: Invited adult access
 
