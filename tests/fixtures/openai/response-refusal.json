@@ -1,0 +1,24 @@
+{
+  "id": "resp_synthetic_refusal",
+  "model": "gpt-synthetic",
+  "status": "completed",
+  "output": [
+    {
+      "id": "msg_synthetic_refusal",
+      "type": "message",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "refusal",
+          "refusal": "Synthetic refusal"
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "input_tokens": 8,
+    "output_tokens": 2,
+    "total_tokens": 10
+  }
+}

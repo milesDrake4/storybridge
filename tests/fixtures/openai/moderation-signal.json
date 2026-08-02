@@ -1,0 +1,19 @@
+{
+  "id": "modr_synthetic_signal",
+  "model": "omni-moderation-latest",
+  "results": [
+    {
+      "flagged": true,
+      "categories": {
+        "self-harm": true,
+        "self-harm/intent": true,
+        "violence": false
+      },
+      "category_scores": {
+        "self-harm": 0.91,
+        "self-harm/intent": 0.88,
+        "violence": 0.02
+      }
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "id": "resp_synthetic_success",
+  "model": "gpt-synthetic",
+  "status": "completed",
+  "output": [
+    {
+      "id": "msg_synthetic_success",
+      "type": "message",
+      "status": "completed",
+      "role": "assistant",
+      "content": [
+        {
+          "type": "output_text",
+          "text": "{\"summary\":\"Synthetic result\"}",
+          "annotations": []
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "input_tokens": 12,
+    "output_tokens": 7,
+    "total_tokens": 19
+  }
+}
