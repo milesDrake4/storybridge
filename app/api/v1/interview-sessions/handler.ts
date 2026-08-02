@@ -47,8 +47,17 @@ function safeError(error: unknown): Response {
   if (error instanceof RequestBoundaryError) {
     return createErrorResponse(error.code);
   }
-  if (error instanceof EligibilityError || error instanceof InterviewError) {
+  if (error instanceof EligibilityError) {
     return createErrorResponse(error.code);
+  }
+  if (error instanceof InterviewError) {
+    return createErrorResponse(error.code, {
+      ...(error.safetyKind
+        ? {
+            fieldErrors: [{ code: error.safetyKind, path: "answer" }],
+          }
+        : {}),
+    });
   }
   if (error instanceof AiOperationError) {
     return createErrorResponse(error.code, {

@@ -25,6 +25,7 @@ import { InterviewSequenceError } from "@/repositories/interview-repository";
 import {
   answerInterview,
   getCurrentInterview,
+  InterviewError,
   startInterview,
 } from "@/services/interview/interview-service";
 
@@ -420,6 +421,28 @@ describe("interview session HTTP API", () => {
     expect(apiErrorSchema.parse(await missingResponse.json()).error.code).toBe(
       "RESOURCE_NOT_FOUND",
     );
+  });
+
+  it("returns only a fixed safety recovery code, never provider detail", async () => {
+    const response = await createInterviewAnswerPostHandler({
+      appUrl,
+      answer: vi
+        .fn()
+        .mockRejectedValue(new InterviewError("VALIDATION_ERROR", "SELF_HARM")),
+    })(
+      jsonRequest(`/api/v1/interview-sessions/${sessionId}/messages`, {
+        answer: "Synthetic safety fixture",
+        questionKey: "ACADEMIC_INTERESTS",
+      }),
+      sessionId,
+    );
+
+    const body = apiErrorSchema.parse(await response.json());
+    expect(response.status).toBe(422);
+    expect(body.error.fieldErrors).toEqual([
+      { code: "SELF_HARM", path: "answer" },
+    ]);
+    expect(JSON.stringify(body)).not.toContain("provider");
   });
 
   it("rejects cross-origin mutations without calling application services", async () => {
