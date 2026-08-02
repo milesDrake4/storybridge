@@ -130,7 +130,7 @@ select throws_ok(
   'authenticated users cannot update policy versions directly'
 );
 select throws_ok(
-  $$insert into private.beta_invitations (normalized_email_hmac, status, expires_at) values ('v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'PENDING', now() + interval '1 day')$$,
+  $$insert into private.beta_invitations (normalized_email_hmac, invite_token_hmac, status, expires_at) values ('v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'v1.' || repeat('b', 43), 'PENDING', now() + interval '1 day')$$,
   '42501',
   null,
   'authenticated users cannot mutate invitations directly'
@@ -182,7 +182,7 @@ select throws_ok(
   'a 26th accepted invitation is rejected atomically'
 );
 select throws_ok(
-  $$insert into private.beta_invitations (normalized_email_hmac, status, expires_at) values ('v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'PENDING', now() + interval '1 day'), ('v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'PENDING', now() + interval '2 days')$$,
+  $$insert into private.beta_invitations (normalized_email_hmac, invite_token_hmac, status, expires_at) values ('v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'v1.' || repeat('c', 43), 'PENDING', now() + interval '1 day'), ('v1.aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'v1.' || repeat('d', 43), 'PENDING', now() + interval '2 days')$$,
   '23505',
   null,
   'only one active invitation can exist per email HMAC'
