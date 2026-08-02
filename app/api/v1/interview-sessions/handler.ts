@@ -1,10 +1,7 @@
-import { isIP } from "node:net";
-
 import { z } from "zod";
 
 import { AiAdapterError } from "@/adapters/openai/client";
 import { interviewSessionIdSchema } from "@/contracts/domain/ids";
-import { idempotencyKeySchema } from "@/contracts/http/v1/common";
 import type {
   InterviewAnswerInput,
   InterviewSession,
@@ -15,7 +12,9 @@ import { interviewAnswerInputSchema } from "@/contracts/http/v1/interviews";
 import { createErrorResponse, createSuccessResponse } from "@/lib/http/respond";
 import {
   assertSameOriginMutation,
+  clientIpAddress,
   readJsonBody,
+  requireIdempotencyKey,
   RequestBoundaryError,
 } from "@/lib/security/request-boundary";
 import { EligibilityError } from "@/services/auth/eligibility";
@@ -74,26 +73,6 @@ function safeError(error: unknown): Response {
   return createErrorResponse("INTERNAL_ERROR");
 }
 
-function requireIdempotencyKey(request: Request): string {
-  const result = idempotencyKeySchema.safeParse(
-    request.headers.get("idempotency-key"),
-  );
-  if (!result.success) {
-    throw new RequestBoundaryError("IDEMPOTENCY_KEY_REQUIRED");
-  }
-  return result.data;
-}
-
-function clientIp(request: Request): string {
-  const forwarded =
-    request.headers.get("x-vercel-forwarded-for") ??
-    request.headers.get("x-forwarded-for")?.split(",", 1)[0];
-  const candidate = forwarded?.trim();
-  return candidate && candidate.length <= 128 && isIP(candidate)
-    ? candidate
-    : "0.0.0.0";
-}
-
 export function createInterviewStartPostHandler(
   dependencies: StartDependencies,
 ) {
@@ -141,7 +120,7 @@ export function createInterviewAnswerPostHandler(
       return createSuccessResponse(
         await dependencies.answer(sessionId.data, input, {
           idempotencyKey,
-          ipAddress: clientIp(request),
+          ipAddress: clientIpAddress(request),
         }),
         { status: 201 },
       );

@@ -318,6 +318,15 @@ export type Database = {
           reset_at: string;
         }[];
       };
+      create_story_profile: {
+        Args: {
+          requested_at?: string;
+          requested_extraction: Json;
+          requested_session_id: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       finalize_ai_operation: {
         Args: {
           requested_at?: string;
@@ -532,6 +541,120 @@ export type Database = {
           terms_version?: string;
           updated_at?: string;
           user_id?: string;
+        };
+        Relationships: [];
+      };
+      story_fact_sources: {
+        Row: {
+          created_at: string;
+          fact_id: string;
+          message_id: string;
+          profile_id: string;
+          session_id: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          fact_id: string;
+          message_id: string;
+          profile_id: string;
+          session_id: string;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          fact_id?: string;
+          message_id?: string;
+          profile_id?: string;
+          session_id?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      story_facts: {
+        Row: {
+          category: string;
+          content_hmac: string;
+          created_at: string;
+          details: Json;
+          id: string;
+          profile_id: string;
+          revision: number;
+          summary: string;
+          suppressed_at: string | null;
+          updated_at: string;
+          user_id: string;
+          verification_status: string;
+          verified_at: string | null;
+        };
+        Insert: {
+          category: string;
+          content_hmac: string;
+          created_at?: string;
+          details: Json;
+          id?: string;
+          profile_id: string;
+          revision?: number;
+          summary: string;
+          suppressed_at?: string | null;
+          updated_at?: string;
+          user_id: string;
+          verification_status?: string;
+          verified_at?: string | null;
+        };
+        Update: {
+          category?: string;
+          content_hmac?: string;
+          created_at?: string;
+          details?: Json;
+          id?: string;
+          profile_id?: string;
+          revision?: number;
+          summary?: string;
+          suppressed_at?: string | null;
+          updated_at?: string;
+          user_id?: string;
+          verification_status?: string;
+          verified_at?: string | null;
+        };
+        Relationships: [];
+      };
+      story_profiles: {
+        Row: {
+          created_at: string;
+          excluded_topics: Json;
+          id: string;
+          revision: number;
+          source_session_id: string;
+          status: string;
+          updated_at: string;
+          user_id: string;
+          version: number;
+          voice_profile: Json;
+        };
+        Insert: {
+          created_at?: string;
+          excluded_topics?: Json;
+          id?: string;
+          revision?: number;
+          source_session_id: string;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+          version: number;
+          voice_profile: Json;
+        };
+        Update: {
+          created_at?: string;
+          excluded_topics?: Json;
+          id?: string;
+          revision?: number;
+          source_session_id?: string;
+          status?: string;
+          updated_at?: string;
+          user_id?: string;
+          version?: number;
+          voice_profile?: Json;
         };
         Relationships: [];
       };
