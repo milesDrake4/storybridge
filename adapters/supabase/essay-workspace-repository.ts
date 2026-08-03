@@ -33,6 +33,15 @@ const workspaceResultSchema = z.object({
   essay: z.unknown(),
   school: z.unknown(),
 });
+const updateResultSchema = z.object({
+  decision: z.enum([
+    "NOT_FOUND",
+    "REVISION_MISMATCH",
+    "STATE_CONFLICT",
+    "UPDATED",
+  ]),
+  essay: z.unknown().nullable(),
+});
 
 function timestamp(value: string): string {
   return new Date(value).toISOString();
@@ -43,6 +52,7 @@ function mapEssay(row: EssayRow) {
     createdAt: timestamp(row.created_at),
     dossierId: row.dossier_id,
     id: row.id,
+    outline: row.outline,
     prompt: row.prompt,
     revision: row.revision,
     schoolId: row.school_id,
@@ -145,6 +155,25 @@ export function createSupabaseEssayWorkspaceRepository(
       return (data ?? []).map((row: { essay: Json; school: Json }) =>
         mapWorkspace(row),
       );
+    },
+    async updateOutline(input) {
+      const { data, error } = await client
+        .schema("private")
+        .rpc("update_essay_outline", {
+          requested_at: input.now.toISOString(),
+          requested_essay_id: input.essayId,
+          requested_expected_revision: input.expectedRevision,
+          requested_outline: input.outline,
+          requested_user_id: input.userId,
+        });
+      if (error) throw error;
+      const result = updateResultSchema.parse(data);
+      if (result.decision !== "UPDATED") return { type: result.decision };
+      if (!result.essay) throw new Error("Updated essay is missing");
+      return {
+        type: "UPDATED",
+        value: mapEssay(result.essay as EssayRow),
+      };
     },
   };
 }

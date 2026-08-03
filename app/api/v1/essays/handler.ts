@@ -4,12 +4,19 @@ import { essayIdSchema, type EssayId } from "@/contracts/domain/ids";
 import type { Page } from "@/contracts/http/v1/common";
 import {
   createEssayInputSchema,
+  essayOutlinePatchSchema,
   essayListQuerySchema,
   type CreateEssayInput,
+  type Essay,
   type EssaySummary,
   type EssayWorkspace,
 } from "@/contracts/http/v1/essays";
-import { revisionEtag } from "@/lib/http/revision-etag";
+import type { OutlineV1 } from "@/contracts/http/v1/outlines";
+import {
+  requireRevision,
+  revisionEtag,
+  RevisionHeaderError,
+} from "@/lib/http/revision-etag";
 import { createErrorResponse, createSuccessResponse } from "@/lib/http/respond";
 import {
   assertSameOriginMutation,
@@ -19,16 +26,48 @@ import {
 } from "@/lib/security/request-boundary";
 import { EligibilityError } from "@/services/auth/eligibility";
 import { EssayWorkspaceError } from "@/services/essays/manage-workspaces";
+import { SaveOutlineError } from "@/services/essays/save-outline";
 
 function safeError(error: unknown): Response {
   if (
     error instanceof RequestBoundaryError ||
     error instanceof EligibilityError ||
-    error instanceof EssayWorkspaceError
+    error instanceof EssayWorkspaceError ||
+    error instanceof RevisionHeaderError ||
+    error instanceof SaveOutlineError
   ) {
     return createErrorResponse(error.code);
   }
   return createErrorResponse("INTERNAL_ERROR");
+}
+
+export function createEssayPatchHandler(dependencies: {
+  appUrl: URL;
+  update(
+    essayId: EssayId,
+    revision: number,
+    outline: OutlineV1,
+  ): Promise<Essay>;
+}) {
+  return async function patchEssay(
+    request: Request,
+    rawEssayId: string,
+  ): Promise<Response> {
+    try {
+      assertSameOriginMutation(request, dependencies.appUrl);
+      const id = parseEssayId(rawEssayId);
+      const revision = requireRevision(request, { id, kind: "essay" });
+      const patch = await readJsonBody(request, essayOutlinePatchSchema);
+      const essay = await dependencies.update(id, revision, patch.outline);
+      return createSuccessResponse(essay, {
+        headers: {
+          etag: revisionEtag({ id: essay.id, kind: "essay" }, essay.revision),
+        },
+      });
+    } catch (error) {
+      return safeError(error);
+    }
+  };
 }
 
 function parseQuery(url: URL): z.output<typeof essayListQuerySchema> {

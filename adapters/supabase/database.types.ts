@@ -557,6 +557,16 @@ export type Database = {
         };
         Returns: Json;
       };
+      update_essay_outline: {
+        Args: {
+          requested_at?: string;
+          requested_essay_id: string;
+          requested_expected_revision: number;
+          requested_outline: Json;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       get_school_dossier: {
         Args: { requested_dossier_id: string; requested_user_id: string };
         Returns: Json;

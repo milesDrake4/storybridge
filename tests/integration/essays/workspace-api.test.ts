@@ -33,6 +33,7 @@ const workspace = {
     createdAt: "2026-08-03T15:00:00.000Z",
     dossierId: null,
     id: essayId,
+    outline: null,
     prompt: "Describe a community that has shaped your perspective.",
     revision: 0,
     schoolId,
@@ -83,6 +84,7 @@ function repository(
     delete: vi.fn().mockResolvedValue(true),
     get: vi.fn().mockResolvedValue(workspace),
     list: vi.fn().mockResolvedValue([workspace]),
+    updateOutline: vi.fn(),
     ...overrides,
   };
 }

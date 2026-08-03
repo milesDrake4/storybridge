@@ -9,6 +9,7 @@ import {
   essayAngleSetSchema,
   type EssayAngle,
 } from "@/contracts/domain/essay-angle";
+import type { EssayAngleId } from "@/contracts/domain/ids";
 import {
   schoolDossierSchema,
   type SchoolDossierSource,
@@ -27,6 +28,7 @@ type Props = {
   initialEssayRevision: number;
   initialSelectedAngleId: string | null;
   onRevisionChange?(revision: number): void;
+  onSelectionChange?(angleId: EssayAngleId): void;
 };
 
 async function json(response: Response) {
@@ -38,6 +40,7 @@ export function AnglePicker({
   initialEssayRevision,
   initialSelectedAngleId,
   onRevisionChange,
+  onSelectionChange,
 }: Props) {
   const [angles, setAngles] = useState<EssayAngle[]>([]);
   const [selectedId, setSelectedId] = useState(initialSelectedAngleId);
@@ -152,7 +155,7 @@ export function AnglePicker({
     }
   }
 
-  async function select(angleId: string) {
+  async function select(angleId: EssayAngleId) {
     setSelectingId(angleId);
     setNotice(null);
     try {
@@ -174,6 +177,7 @@ export function AnglePicker({
         return;
       }
       setSelectedId(angleId);
+      onSelectionChange?.(angleId);
       const nextRevision =
         Math.max(initialEssayRevision, currentRevision.current) + 1;
       currentRevision.current = nextRevision;

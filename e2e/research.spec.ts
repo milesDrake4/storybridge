@@ -31,6 +31,7 @@ const workspace = {
     createdAt: now,
     dossierId: null,
     id: essayId,
+    outline: null,
     prompt: "Describe a community that has shaped your perspective.",
     revision: 0,
     schoolId,

@@ -12,6 +12,7 @@ import {
   rfc3339UtcSchema,
 } from "@/contracts/http/v1/common";
 import { schoolSummarySchema } from "@/contracts/http/v1/schools";
+import { outlineV1Schema } from "@/contracts/http/v1/outlines";
 
 export const applicationSeasonSchema = z.literal("2026-2027");
 export type ApplicationSeason = z.infer<typeof applicationSeasonSchema>;
@@ -24,6 +25,10 @@ export const essayStatusSchema = z.enum([
   "COMPLETE",
 ]);
 export type EssayStatus = z.infer<typeof essayStatusSchema>;
+
+export const essayOutlinePatchSchema = z.strictObject({
+  outline: outlineV1Schema,
+});
 
 export const createEssayInputSchema = z.strictObject({
   prompt: z.string().min(25).max(2_000),
@@ -42,6 +47,7 @@ export const essaySchema = z.object({
   createdAt: rfc3339UtcSchema,
   dossierId: z.uuid().nullable(),
   id: essayIdSchema,
+  outline: outlineV1Schema.nullable(),
   prompt: z.string().min(25).max(2_000),
   revision: z.number().int().nonnegative(),
   schoolId: schoolIdSchema,

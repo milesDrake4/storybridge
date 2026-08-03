@@ -152,6 +152,7 @@ describe("research refresh service", () => {
           createdAt: dossier.createdAt,
           dossierId: dossier.id,
           id: essayId,
+          outline: null,
           prompt: "Describe a community that has shaped your perspective.",
           revision: 7,
           schoolId: school.id,
@@ -165,6 +166,7 @@ describe("research refresh service", () => {
         school,
       }),
       list: vi.fn(),
+      updateOutline: vi.fn(),
     } as EssayWorkspaceRepository;
     const dossiers = {
       commit: vi.fn(),
