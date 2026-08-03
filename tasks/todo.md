@@ -16,8 +16,8 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 - [x] 5. Create the local Supabase ownership baseline
 - [x] 6. Deliver uniform magic-link request and callback APIs
 - [x] 7. Enforce consent and beta eligibility
-- [ ] 8. Build sign-in, consent, and authenticated shell UI
-- [ ] Checkpoint 1: Invited access green
+- [x] 8. Build sign-in, consent, and authenticated shell UI
+- [x] Checkpoint 1: Invited access green
 
 ## Slice 2: Interview and Story Vault
 
@@ -33,26 +33,26 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 - [x] 15. Provide the verified school registry
 - [x] 16. Create entitlement-aware essay workspaces
-- [ ] 17. Build essay dashboard and setup UI
+- [x] 17. Build essay dashboard and setup UI
 - [x] 18. Implement privacy-separated school research adapter
-- [ ] 19. Persist and display a cited school dossier
-- [ ] 20. Make dossier refresh invalidate dependents atomically
-- [ ] Checkpoint 3: Essay setup and research green
+- [x] 19. Persist and display a cited school dossier
+- [x] 20. Make dossier refresh invalidate dependents atomically
+- [x] Checkpoint 3: Essay setup and research green
 
 ## Slice 4: Personalized strategy and outline
 
-- [ ] 21. Generate evidence-linked essay angles
-- [ ] 22. Deliver angle comparison and selection UI
-- [ ] 23. Generate immutable outline proposals
-- [ ] 24. Build ETag-safe outline editing
-- [ ] Checkpoint 4: Strategy and outline green
+- [x] 21. Generate evidence-linked essay angles
+- [x] 22. Deliver angle comparison and selection UI
+- [x] 23. Generate immutable outline proposals
+- [x] 24. Build ETag-safe outline editing
+- [x] Checkpoint 4: Strategy and outline green
 
 ## Slice 5: Student-led drafting
 
-- [ ] 25. Persist conflict-safe drafts and versions
-- [ ] 26. Build the autosaving plain-text editor
-- [ ] 27. Deliver advice-only coaching
-- [ ] 28. Generate rewrite and continuation proposals
+- [x] 25. Persist conflict-safe drafts and versions
+- [x] 26. Build the autosaving plain-text editor
+- [x] 27. Deliver advice-only coaching
+- [x] 28. Generate rewrite and continuation proposals
 - [ ] 29. Preview and atomically accept eligible proposals
 - [ ] Checkpoint 5: Student-led drafting green
 
