@@ -41,6 +41,18 @@ const resultSchema = z.object({
   ]),
 });
 
+const selectionSchema = z.object({
+  decision: z.enum(["NOT_FOUND", "REPLAY", "SELECTED", "STATE_CONFLICT"]),
+});
+const updateSchema = z.object({
+  decision: z.enum([
+    "NOT_FOUND",
+    "REVISION_MISMATCH",
+    "STATE_CONFLICT",
+    "UPDATED",
+  ]),
+});
+
 function mapAngle(value: unknown): EssayAngle {
   const row = rowSchema.parse(value);
   return essayAngleSchema.parse({
@@ -111,6 +123,33 @@ export function createSupabaseEssayAngleRepository(
         });
       if (error) throw error;
       return z.array(z.unknown()).parse(data).map(mapAngle);
+    },
+    async select(input) {
+      const { data, error } = await client
+        .schema("private")
+        .rpc("select_essay_angle", {
+          requested_angle_id: input.angleId,
+          requested_at: input.now.toISOString(),
+          requested_essay_id: input.essayId,
+          requested_user_id: input.userId,
+        });
+      if (error) throw error;
+      return { type: selectionSchema.parse(data).decision };
+    },
+    async update(input) {
+      const { data, error } = await client
+        .schema("private")
+        .rpc("update_essay_angle", {
+          requested_angle_id: input.angleId,
+          requested_at: input.now.toISOString(),
+          requested_essay_id: input.essayId,
+          requested_expected_revision: input.expectedRevision,
+          requested_thesis: input.patch.thesis,
+          requested_title: input.patch.title,
+          requested_user_id: input.userId,
+        });
+      if (error) throw error;
+      return { type: updateSchema.parse(data).decision };
     },
   };
 }

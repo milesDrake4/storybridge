@@ -513,6 +513,27 @@ export type Database = {
         };
         Returns: Json;
       };
+      select_essay_angle: {
+        Args: {
+          requested_angle_id: string;
+          requested_at?: string;
+          requested_essay_id: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
+      update_essay_angle: {
+        Args: {
+          requested_angle_id: string;
+          requested_at?: string;
+          requested_essay_id: string;
+          requested_expected_revision: number;
+          requested_thesis: string;
+          requested_title: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       get_school_dossier: {
         Args: { requested_dossier_id: string; requested_user_id: string };
         Returns: Json;

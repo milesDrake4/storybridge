@@ -85,6 +85,7 @@ describe("essay setup", () => {
         prompt: "Describe a community that has shaped your perspective.",
         revision: 0,
         schoolId: school.id,
+        selectedAngleId: null,
         season: "2026-2027",
         status: "STRATEGY",
         updatedAt: now,

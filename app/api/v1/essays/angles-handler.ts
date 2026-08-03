@@ -69,3 +69,23 @@ export function createAnglesPostHandler(dependencies: {
     }
   };
 }
+
+export function createAnglesGetHandler(dependencies: {
+  list(essayId: EssayId): Promise<EssayAngle[]>;
+}) {
+  return async function getAngles(rawEssayId: string): Promise<Response> {
+    try {
+      return createSuccessResponse({
+        angles: await dependencies.list(parseEssayId(rawEssayId)),
+      });
+    } catch (error) {
+      if (
+        error instanceof EligibilityError ||
+        error instanceof EssayAngleError
+      ) {
+        return createErrorResponse(error.code);
+      }
+      return createErrorResponse("INTERNAL_ERROR");
+    }
+  };
+}

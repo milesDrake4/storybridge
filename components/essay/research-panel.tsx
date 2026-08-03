@@ -16,6 +16,7 @@ type Props = {
   essayId: string;
   essayRevision: number;
   initialDossier?: SchoolDossier | null;
+  onRevisionChange?(revision: number): void;
 };
 
 async function json(response: Response) {
@@ -49,9 +50,10 @@ export function ResearchPanel({
   essayId,
   essayRevision,
   initialDossier,
+  onRevisionChange,
 }: Props) {
   const [dossier, setDossier] = useState(initialDossier ?? null);
-  const [currentRevision, setCurrentRevision] = useState(essayRevision);
+  const currentRevision = useRef(essayRevision);
   const [loading, setLoading] = useState(initialDossier === undefined);
   const [researching, setResearching] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -103,7 +105,12 @@ export function ResearchPanel({
           "content-type": "application/json",
           "idempotency-key": pendingKey.current,
           ...(refresh
-            ? { "if-match": `"essay:${essayId}:r${currentRevision}"` }
+            ? {
+                "if-match": `"essay:${essayId}:r${Math.max(
+                  essayRevision,
+                  currentRevision.current,
+                )}"`,
+              }
             : {}),
         },
         method: "POST",
@@ -120,10 +127,11 @@ export function ResearchPanel({
       if (!parsed.success) throw new Error();
       pendingKey.current = null;
       setDossier(parsed.data.data);
-      setCurrentRevision(
+      const nextRevision =
         revisionFromEtag(response.headers.get("etag"), essayId) ??
-          currentRevision + 1,
-      );
+        Math.max(essayRevision, currentRevision.current) + 1;
+      currentRevision.current = nextRevision;
+      onRevisionChange?.(nextRevision);
       setConfirmingRefresh(false);
     } catch {
       setNotice(errorCopy(null));

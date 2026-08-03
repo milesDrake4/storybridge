@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  essayAngleIdSchema,
   essayIdSchema,
   schoolIdSchema,
   userIdSchema,
@@ -44,6 +45,7 @@ export const essaySchema = z.object({
   prompt: z.string().min(25).max(2_000),
   revision: z.number().int().nonnegative(),
   schoolId: schoolIdSchema,
+  selectedAngleId: essayAngleIdSchema.nullable(),
   season: applicationSeasonSchema,
   status: essayStatusSchema,
   updatedAt: rfc3339UtcSchema,

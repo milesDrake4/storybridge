@@ -36,6 +36,7 @@ const workspace = {
     prompt: "Describe a community that has shaped your perspective.",
     revision: 0,
     schoolId,
+    selectedAngleId: null,
     season: "2026-2027" as const,
     status: "STRATEGY" as const,
     updatedAt: "2026-08-03T15:00:00.000Z",

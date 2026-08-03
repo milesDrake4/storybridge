@@ -15,6 +15,12 @@ export const angleGenerationInputSchema = z.strictObject({
 });
 export type AngleGenerationInput = z.infer<typeof angleGenerationInputSchema>;
 
+export const essayAnglePatchSchema = z.strictObject({
+  thesis: z.string().trim().min(1).max(800),
+  title: z.string().trim().min(1).max(160),
+});
+export type EssayAnglePatch = z.infer<typeof essayAnglePatchSchema>;
+
 export const essayAngleDraftSchema = z.strictObject({
   promptFit: z.string().trim().min(1).max(600),
   risk: z.string().trim().min(1).max(400),
@@ -87,3 +93,7 @@ export const essayAngleSetSchema = z.strictObject({
   angles: z.tuple([essayAngleSchema, essayAngleSchema, essayAngleSchema]),
 });
 export type EssayAngleSet = z.infer<typeof essayAngleSetSchema>;
+
+export const essayAngleListSchema = z.strictObject({
+  angles: z.array(essayAngleSchema).max(3),
+});

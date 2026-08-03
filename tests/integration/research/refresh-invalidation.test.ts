@@ -155,6 +155,7 @@ describe("research refresh service", () => {
           prompt: "Describe a community that has shaped your perspective.",
           revision: 7,
           schoolId: school.id,
+          selectedAngleId: null,
           season: "2026-2027",
           status: "STRATEGY",
           updatedAt: dossier.updatedAt,
