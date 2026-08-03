@@ -14,10 +14,12 @@ Run these checks in an unrestricted macOS shell or CI environment:
 npm run test:e2e -- --project=chromium e2e/invited-access.spec.ts
 E2E_AUTH_STORAGE_STATE=/absolute/path/to/invited-adult-storage-state.json \
   npm run test:e2e -- --project=chromium e2e/interview.spec.ts
+E2E_AUTH_STORAGE_STATE=/absolute/path/to/invited-adult-storage-state.json \
+  npm run test:e2e -- --project=chromium e2e/story-vault.spec.ts
 ```
 
-The interview storage state must contain a current authenticated Supabase user
-whose invitation, adult profile, and policy consent are valid in the target
-test environment. Client interview API calls are synthetic and intercepted by
-the specification; the session is needed only for the server-rendered product
-access gate.
+The interview and Story Vault storage state must contain a current authenticated
+Supabase user whose invitation, adult profile, and policy consent are valid in
+the target test environment. Their client API calls are synthetic and
+intercepted by the specifications; the session is needed only for the
+server-rendered product access gate.

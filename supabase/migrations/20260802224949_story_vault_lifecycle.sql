@@ -103,6 +103,10 @@ begin
   where id = current_fact.id
   returning * into current_fact;
 
+  update public.story_profiles
+  set status = 'REVIEW_REQUIRED'
+  where id = current_fact.profile_id and status <> 'REVIEW_REQUIRED';
+
   return jsonb_build_object('decision', 'UPDATED', 'fact', to_jsonb(current_fact));
 end;
 $$;
@@ -128,14 +132,21 @@ begin
   for update;
 
   if not found then return jsonb_build_object('decision', 'NOT_FOUND', 'fact', null); end if;
+  if requested_decision not in ('VERIFY', 'REJECT') then
+    raise exception using errcode = '22023', message = 'invalid verification decision';
+  end if;
+  if current_fact.revision = requested_expected_revision + 1
+    and current_fact.content_hmac = requested_content_hmac
+    and current_fact.verification_status::text = (case requested_decision
+      when 'VERIFY' then 'VERIFIED'
+      when 'REJECT' then 'REJECTED'
+    end) then
+    return jsonb_build_object('decision', 'REPLAY', 'fact', to_jsonb(current_fact));
+  end if;
   if current_fact.revision <> requested_expected_revision
     or current_fact.content_hmac <> requested_content_hmac then
     return jsonb_build_object('decision', 'REVISION_MISMATCH', 'fact', null);
   end if;
-  if requested_decision not in ('VERIFY', 'REJECT') then
-    raise exception using errcode = '22023', message = 'invalid verification decision';
-  end if;
-
   update public.story_facts
   set
     verification_status = case requested_decision when 'VERIFY' then 'VERIFIED' else 'REJECTED' end,
@@ -144,6 +155,17 @@ begin
     updated_at = requested_at
   where id = current_fact.id
   returning * into current_fact;
+
+  update public.story_profiles profiles
+  set status = case
+    when exists (
+      select 1 from public.story_facts facts
+      where facts.profile_id = current_fact.profile_id
+        and facts.verification_status = 'UNVERIFIED'
+    ) then 'REVIEW_REQUIRED'
+    else 'ACTIVE'
+  end
+  where profiles.id = current_fact.profile_id;
 
   return jsonb_build_object('decision', 'UPDATED', 'fact', to_jsonb(current_fact));
 end;
@@ -192,15 +214,29 @@ create function private.delete_story_fact(
   requested_fact_id uuid
 )
 returns boolean
-language sql
+language plpgsql
 set search_path = ''
 as $$
-  with deleted as (
-    delete from public.story_facts
-    where user_id = requested_user_id and id = requested_fact_id
-    returning 1
-  )
-  select exists(select 1 from deleted);
+declare
+  deleted_profile_id uuid;
+begin
+  delete from public.story_facts
+  where user_id = requested_user_id and id = requested_fact_id
+  returning profile_id into deleted_profile_id;
+  if not found then return false; end if;
+
+  update public.story_profiles profiles
+  set status = case
+    when exists (
+      select 1 from public.story_facts facts
+      where facts.profile_id = deleted_profile_id
+        and facts.verification_status = 'UNVERIFIED'
+    ) then 'REVIEW_REQUIRED'
+    else 'ACTIVE'
+  end
+  where profiles.id = deleted_profile_id;
+  return true;
+end;
 $$;
 
 create function private.get_story_facts_for_ai(requested_user_id uuid)

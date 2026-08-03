@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(28);
+select plan(29);
 
 select has_table('public', 'story_profiles', 'story profiles table exists');
 select has_table('public', 'story_facts', 'story facts table exists');
@@ -184,6 +184,16 @@ select is(
   ) ->> 'decision',
   'UPDATED',
   'the current edited content can be verified explicitly'
+);
+select is(
+  private.set_story_fact_verification(
+    'a0000000-0000-4000-8000-000000000001',
+    (select id from academic_fact), 3,
+    'v1.CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC',
+    'VERIFY', '2026-08-02T16:00:16Z'
+  ) ->> 'decision',
+  'REPLAY',
+  'verification replay does not advance the revision twice'
 );
 
 update public.story_profiles set status = 'ACTIVE';
