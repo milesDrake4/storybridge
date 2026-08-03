@@ -26,9 +26,27 @@ export const essayStatusSchema = z.enum([
 ]);
 export type EssayStatus = z.infer<typeof essayStatusSchema>;
 
-export const essayOutlinePatchSchema = z.strictObject({
-  outline: outlineV1Schema,
-});
+export const draftTextSchema = z
+  .string()
+  .max(20_000)
+  .refine(
+    (value) => !/[\u0000-\u0009\u000b\u000c\u000e-\u001f\u007f]/u.test(value),
+    "Draft contains unsupported control characters",
+  );
+
+export const essayPatchSchema = z
+  .strictObject({
+    draftText: draftTextSchema.optional(),
+    outline: outlineV1Schema.optional(),
+    status: essayStatusSchema.optional(),
+  })
+  .refine((patch) => Object.keys(patch).length > 0, "Patch cannot be empty");
+export type EssayPatch = z.infer<typeof essayPatchSchema>;
+
+export const essayOutlinePatchSchema = essayPatchSchema.refine(
+  (patch) => patch.outline !== undefined,
+  "Outline is required",
+);
 
 export const createEssayInputSchema = z.strictObject({
   prompt: z.string().min(25).max(2_000),
@@ -46,6 +64,7 @@ export type EssayListQuery = z.infer<typeof essayListQuerySchema>;
 export const essaySchema = z.object({
   createdAt: rfc3339UtcSchema,
   dossierId: z.uuid().nullable(),
+  draftText: draftTextSchema,
   id: essayIdSchema,
   outline: outlineV1Schema.nullable(),
   prompt: z.string().min(25).max(2_000),

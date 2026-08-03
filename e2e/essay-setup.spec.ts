@@ -38,6 +38,7 @@ const workspace = {
   essay: {
     createdAt: now,
     dossierId: null,
+    draftText: "",
     id: essayId,
     outline: null,
     prompt,

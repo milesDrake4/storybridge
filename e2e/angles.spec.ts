@@ -119,6 +119,7 @@ test("compares evidence-linked angles and preserves selection on reload", async 
         essay: {
           createdAt: now,
           dossierId,
+          draftText: "",
           id: essayId,
           outline: null,
           prompt: "How will your experiences help you contribute?",

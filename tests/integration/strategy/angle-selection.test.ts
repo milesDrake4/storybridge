@@ -20,6 +20,7 @@ const angleId = "c2000000-0000-4000-8000-000000000001" as EssayAngleId;
 const essay = {
   createdAt: now.toISOString(),
   dossierId: "c3000000-0000-4000-8000-000000000001",
+  draftText: "",
   id: essayId,
   outline: null,
   prompt: "How will your experiences help you contribute to our community?",

@@ -4,14 +4,14 @@ import { essayIdSchema, type EssayId } from "@/contracts/domain/ids";
 import type { Page } from "@/contracts/http/v1/common";
 import {
   createEssayInputSchema,
-  essayOutlinePatchSchema,
   essayListQuerySchema,
+  essayPatchSchema,
   type CreateEssayInput,
   type Essay,
+  type EssayPatch,
   type EssaySummary,
   type EssayWorkspace,
 } from "@/contracts/http/v1/essays";
-import type { OutlineV1 } from "@/contracts/http/v1/outlines";
 import {
   requireRevision,
   revisionEtag,
@@ -26,6 +26,7 @@ import {
 } from "@/lib/security/request-boundary";
 import { EligibilityError } from "@/services/auth/eligibility";
 import { EssayWorkspaceError } from "@/services/essays/manage-workspaces";
+import { SaveDraftError } from "@/services/essays/save-draft";
 import { SaveOutlineError } from "@/services/essays/save-outline";
 
 function safeError(error: unknown): Response {
@@ -34,6 +35,7 @@ function safeError(error: unknown): Response {
     error instanceof EligibilityError ||
     error instanceof EssayWorkspaceError ||
     error instanceof RevisionHeaderError ||
+    error instanceof SaveDraftError ||
     error instanceof SaveOutlineError
   ) {
     return createErrorResponse(error.code);
@@ -43,11 +45,7 @@ function safeError(error: unknown): Response {
 
 export function createEssayPatchHandler(dependencies: {
   appUrl: URL;
-  update(
-    essayId: EssayId,
-    revision: number,
-    outline: OutlineV1,
-  ): Promise<Essay>;
+  update(essayId: EssayId, revision: number, patch: EssayPatch): Promise<Essay>;
 }) {
   return async function patchEssay(
     request: Request,
@@ -57,8 +55,8 @@ export function createEssayPatchHandler(dependencies: {
       assertSameOriginMutation(request, dependencies.appUrl);
       const id = parseEssayId(rawEssayId);
       const revision = requireRevision(request, { id, kind: "essay" });
-      const patch = await readJsonBody(request, essayOutlinePatchSchema);
-      const essay = await dependencies.update(id, revision, patch.outline);
+      const patch = await readJsonBody(request, essayPatchSchema);
+      const essay = await dependencies.update(id, revision, patch);
       return createSuccessResponse(essay, {
         headers: {
           etag: revisionEtag({ id: essay.id, kind: "essay" }, essay.revision),

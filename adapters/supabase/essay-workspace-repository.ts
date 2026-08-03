@@ -47,10 +47,11 @@ function timestamp(value: string): string {
   return new Date(value).toISOString();
 }
 
-function mapEssay(row: EssayRow) {
+export function mapEssay(row: EssayRow) {
   return essaySchema.parse({
     createdAt: timestamp(row.created_at),
     dossierId: row.dossier_id,
+    draftText: row.draft_text,
     id: row.id,
     outline: row.outline,
     prompt: row.prompt,

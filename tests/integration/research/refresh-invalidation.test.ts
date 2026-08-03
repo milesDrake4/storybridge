@@ -151,6 +151,7 @@ describe("research refresh service", () => {
         essay: {
           createdAt: dossier.createdAt,
           dossierId: dossier.id,
+          draftText: "",
           id: essayId,
           outline: null,
           prompt: "Describe a community that has shaped your perspective.",

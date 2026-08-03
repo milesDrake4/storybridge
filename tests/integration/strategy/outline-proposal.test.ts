@@ -140,6 +140,7 @@ function dependencies(overrides: Record<string, unknown> = {}) {
     delete: vi.fn(),
     get: vi.fn().mockResolvedValue({
       essay: {
+        draftText: "",
         outline: null,
         createdAt: now.toISOString(),
         dossierId,
