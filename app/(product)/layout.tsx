@@ -43,6 +43,7 @@ export default async function ProductLayout({
         <nav className="product-nav" aria-label="Workspace">
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/interview">Interview</Link>
+          <Link href="/story-vault">Story Vault</Link>
         </nav>
         <main className="product-main">{children}</main>
       </div>

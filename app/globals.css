@@ -491,6 +491,169 @@ textarea:focus-visible {
   margin-top: 0.75rem;
 }
 
+.story-vault {
+  margin: 0 auto;
+  max-width: 64rem;
+}
+
+.story-vault-intro {
+  border-top: 2px solid var(--accent);
+  padding-top: 1.25rem;
+}
+
+.story-vault-intro h1 {
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  margin: 1rem 0 0;
+  text-wrap: balance;
+}
+
+.story-vault-intro > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.7;
+  max-width: 44rem;
+}
+
+.vault-notice {
+  border-left: 3px solid var(--accent-strong);
+  margin: 1.5rem 0;
+  padding: 0.25rem 0 0.25rem 0.8rem;
+}
+
+.excluded-topics {
+  background: var(--paper-strong);
+  display: grid;
+  gap: 0.75rem;
+  margin: 2.5rem 0;
+  padding: 1.25rem;
+}
+
+.excluded-topics p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: -0.35rem 0 0;
+}
+
+.excluded-topics textarea,
+.fact-edit-form textarea {
+  background: var(--paper);
+  border: 1px solid var(--muted);
+  border-radius: 0;
+  color: var(--ink);
+  line-height: 1.55;
+  padding: 0.75rem;
+  resize: vertical;
+  width: 100%;
+}
+
+.excluded-topics .button {
+  justify-self: start;
+}
+
+.fact-list {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.fact-card {
+  border: 1px solid var(--line);
+  padding: clamp(1rem, 3vw, 1.75rem);
+}
+
+.fact-card-header {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.fact-card-header .eyebrow {
+  margin: 0;
+}
+
+.fact-status {
+  border: 1px solid var(--line);
+  font-family: monospace;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.4rem;
+  text-transform: uppercase;
+}
+
+.status-verified {
+  border-color: var(--accent-strong);
+  color: var(--accent-strong);
+}
+
+.fact-card h2 {
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  letter-spacing: -0.025em;
+  margin: 1rem 0 0;
+}
+
+.fact-details {
+  color: var(--muted);
+  line-height: 1.6;
+  padding-left: 1.25rem;
+}
+
+.fact-sources {
+  border-top: 1px solid var(--line);
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+}
+
+.fact-sources summary {
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.fact-sources blockquote {
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 1rem 0 0;
+  padding-left: 1rem;
+}
+
+.fact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+
+.fact-actions .button {
+  min-height: 2.35rem;
+}
+
+.danger-button {
+  border: 1px solid #a43e32;
+  color: #762b23;
+}
+
+.delete-confirmation {
+  background: var(--paper-strong);
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.delete-confirmation p {
+  margin: 0;
+}
+
+.fact-edit-form {
+  display: grid;
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.fact-edit-form .field-input {
+  width: 100%;
+}
+
 .policy-page {
   margin: 0 auto;
   max-width: 72rem;

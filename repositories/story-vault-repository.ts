@@ -1,5 +1,6 @@
 import type {
   InterviewSessionId,
+  StoryFactId,
   StoryProfileId,
   UserId,
 } from "@/contracts/domain/ids";
@@ -62,7 +63,7 @@ export interface StoryVaultRepository {
   updateFact(input: {
     contentHmac: ContentHmac;
     expectedRevision: number;
-    factId: string;
+    factId: StoryFactId;
     now: Date;
     patch: StoryFactPatch;
     userId: UserId;
@@ -71,16 +72,16 @@ export interface StoryVaultRepository {
     contentHmac: string;
     decision: "VERIFY" | "REJECT";
     expectedRevision: number;
-    factId: string;
+    factId: StoryFactId;
     now: Date;
     userId: UserId;
   }): Promise<StoryMutationDecision<StoryFact>>;
   suppressFact(input: {
-    factId: string;
+    factId: StoryFactId;
     now: Date;
     suppressed: boolean;
     userId: UserId;
   }): Promise<StoryMutationDecision<StoryFact>>;
-  deleteFact(userId: UserId, factId: string): Promise<boolean>;
+  deleteFact(userId: UserId, factId: StoryFactId): Promise<boolean>;
   getFactsForAi(userId: UserId): Promise<StoryFact[]>;
 }
