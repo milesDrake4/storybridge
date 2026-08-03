@@ -9,6 +9,7 @@ import {
   type EssayWorkspace as EssayWorkspaceValue,
 } from "@/contracts/http/v1/essays";
 import { ResearchPanel } from "@/components/essay/research-panel";
+import { AnglePicker } from "@/components/essay/angle-picker";
 
 type Props = { essayId: string; initialWorkspace?: EssayWorkspaceValue };
 
@@ -16,6 +17,12 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
   const [workspace, setWorkspace] = useState(initialWorkspace ?? null);
   const [loading, setLoading] = useState(initialWorkspace === undefined);
   const [error, setError] = useState(false);
+
+  const updateRevision = useCallback((revision: number) => {
+    setWorkspace((current) =>
+      current ? { ...current, essay: { ...current.essay, revision } } : current,
+    );
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -106,6 +113,13 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
       <ResearchPanel
         essayId={workspace.essay.id}
         essayRevision={workspace.essay.revision}
+        onRevisionChange={updateRevision}
+      />
+      <AnglePicker
+        essayId={workspace.essay.id}
+        initialEssayRevision={workspace.essay.revision}
+        initialSelectedAngleId={workspace.essay.selectedAngleId}
+        onRevisionChange={updateRevision}
       />
       <Link className="button button-secondary" href="/essays">
         Back to essays

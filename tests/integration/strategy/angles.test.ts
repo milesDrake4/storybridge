@@ -129,6 +129,8 @@ function dependencies(overrides: Record<string, unknown> = {}) {
   const angles = {
     commit: vi.fn().mockResolvedValue({ type: "CREATED", value: persisted }),
     list: vi.fn().mockResolvedValue(persisted),
+    select: vi.fn(),
+    update: vi.fn(),
   } satisfies EssayAngleRepository;
   const essays = {
     create: vi.fn(),
@@ -142,6 +144,7 @@ function dependencies(overrides: Record<string, unknown> = {}) {
           "How will your experiences help you contribute to our community?",
         revision: 1,
         schoolId: dossier.schoolId,
+        selectedAngleId: null,
         season: "2026-2027",
         status: "STRATEGY",
         updatedAt: now.toISOString(),

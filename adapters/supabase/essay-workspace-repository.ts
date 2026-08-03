@@ -46,6 +46,7 @@ function mapEssay(row: EssayRow) {
     prompt: row.prompt,
     revision: row.revision,
     schoolId: row.school_id,
+    selectedAngleId: row.selected_angle_id,
     season: row.season,
     status: row.status,
     updatedAt: timestamp(row.updated_at),

@@ -1,9 +1,11 @@
 import type {
   EssayAngle,
   EssayAngleDraft,
+  EssayAnglePatch,
 } from "@/contracts/domain/essay-angle";
 import type {
   AiOperationId,
+  EssayAngleId,
   EssayId,
   SchoolDossierId,
   UserId,
@@ -37,4 +39,23 @@ export interface EssayAngleRepository {
     userId: UserId;
   }): Promise<CommitEssayAnglesDecision>;
   list(userId: UserId, essayId: EssayId): Promise<EssayAngle[]>;
+  select(input: {
+    angleId: EssayAngleId;
+    essayId: EssayId;
+    now: Date;
+    userId: UserId;
+  }): Promise<
+    { type: "NOT_FOUND" | "STATE_CONFLICT" } | { type: "REPLAY" | "SELECTED" }
+  >;
+  update(input: {
+    angleId: EssayAngleId;
+    essayId: EssayId;
+    expectedRevision: number;
+    now: Date;
+    patch: EssayAnglePatch;
+    userId: UserId;
+  }): Promise<
+    | { type: "NOT_FOUND" | "REVISION_MISMATCH" | "STATE_CONFLICT" }
+    | { type: "UPDATED" }
+  >;
 }

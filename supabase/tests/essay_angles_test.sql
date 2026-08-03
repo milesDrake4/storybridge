@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(27);
+select plan(36);
 
 select has_table('public', 'essay_angles', 'essay angles table exists');
 select has_table('public', 'angle_story_facts', 'angle fact links exist');
@@ -232,6 +232,58 @@ select is(
   'REGENERATION_USED', 'a second regeneration is rejected'
 );
 select is((select count(*) from public.essay_angles), 3::bigint, 'rejected second regeneration changes nothing');
+
+create temp table selected_angle as
+select id from public.essay_angles order by position limit 1;
+select is(
+  private.update_essay_angle(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    (select id from selected_angle), 1, 'Student-edited strategy',
+    'A student-edited thesis grounded in the same evidence.',
+    '2026-08-03T20:04:30Z'
+  ) ->> 'decision',
+  'UPDATED', 'a current ETag persists an owned angle edit'
+);
+select is(
+  (select title from public.essay_angles where id = (select id from selected_angle)),
+  'Student-edited strategy', 'the angle edit survives reload'
+);
+select is((select revision from public.essays), 2, 'angle editing advances the essay revision');
+select is(
+  private.update_essay_angle(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    (select id from selected_angle), 1, 'Stale replacement', 'Stale thesis.',
+    '2026-08-03T20:04:31Z'
+  ) ->> 'decision',
+  'REVISION_MISMATCH', 'a stale edit cannot replace newer strategy text'
+);
+select is(
+  private.select_essay_angle(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    (select id from selected_angle), '2026-08-03T20:05:00Z'
+  ) ->> 'decision',
+  'SELECTED', 'an owned current-dossier angle is selected atomically'
+);
+select is(
+  (select selected_angle_id from public.essays),
+  (select id from selected_angle),
+  'selection persists on the essay for reload'
+);
+select is((select status from public.essays), 'OUTLINING', 'selection advances the workflow');
+select is(
+  private.select_essay_angle(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    (select id from selected_angle), '2026-08-03T20:05:01Z'
+  ) ->> 'decision',
+  'REPLAY', 'repeated selection is idempotent'
+);
+select is(
+  private.select_essay_angle(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    'e9999999-0000-4000-8000-000000000001', '2026-08-03T20:05:02Z'
+  ) ->> 'decision',
+  'NOT_FOUND', 'an unrelated angle is masked as missing'
+);
 
 select private.invalidate_essay_research_dependents(
   'e0000000-0000-4000-8000-000000000001', (select id from angle_essay)
