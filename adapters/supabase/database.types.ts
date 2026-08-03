@@ -446,11 +446,35 @@ export type Database = {
         };
         Returns: Json;
       };
+      commit_school_dossier: {
+        Args: {
+          requested_at?: string;
+          requested_draft: Json;
+          requested_essay_id: string;
+          requested_final_cost_cents: number;
+          requested_input_tokens: number;
+          requested_latency_ms: number;
+          requested_model_id: string;
+          requested_operation_id: string;
+          requested_output_tokens: number;
+          requested_provider_request_id: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       delete_essay_workspace: {
         Args: { requested_essay_id: string; requested_user_id: string };
         Returns: boolean;
       };
       get_essay_workspace: {
+        Args: { requested_essay_id: string; requested_user_id: string };
+        Returns: Json;
+      };
+      get_school_dossier: {
+        Args: { requested_dossier_id: string; requested_user_id: string };
+        Returns: Json;
+      };
+      get_school_dossier_for_essay: {
         Args: { requested_essay_id: string; requested_user_id: string };
         Returns: Json;
       };
@@ -818,6 +842,64 @@ export type Database = {
           url?: string | null;
           user_id?: string;
         };
+        Relationships: [];
+      };
+      school_dossiers: {
+        Row: {
+          created_at: string;
+          essay_id: string;
+          id: string;
+          operation_id: string;
+          schema_version: string;
+          school_id: string;
+          summary: string;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          essay_id: string;
+          id?: string;
+          operation_id: string;
+          schema_version?: string;
+          school_id: string;
+          summary: string;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["school_dossiers"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      school_dossier_sources: {
+        Row: {
+          category: string;
+          claim: string;
+          created_at: string;
+          dossier_id: string;
+          id: string;
+          normalized_url: string;
+          retrieved_at: string;
+          supporting_excerpt: string;
+          title: string;
+          user_id: string;
+        };
+        Insert: {
+          category: string;
+          claim: string;
+          created_at?: string;
+          dossier_id: string;
+          id?: string;
+          normalized_url: string;
+          retrieved_at: string;
+          supporting_excerpt: string;
+          title: string;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["school_dossier_sources"]["Insert"]
+        >;
         Relationships: [];
       };
       story_fact_sources: {

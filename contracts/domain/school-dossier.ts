@@ -1,6 +1,13 @@
 import { z } from "zod";
 
 import { rfc3339UtcSchema } from "@/contracts/http/v1/common";
+import {
+  essayIdSchema,
+  schoolDossierIdSchema,
+  schoolDossierSourceIdSchema,
+  schoolIdSchema,
+  userIdSchema,
+} from "@/contracts/domain/ids";
 
 export const schoolResearchCategorySchema = z.enum([
   "ACADEMICS",
@@ -48,3 +55,21 @@ export const schoolDossierDraftSchema = z.strictObject({
   summary: z.string().trim().min(1).max(1_500),
 });
 export type SchoolDossierDraft = z.infer<typeof schoolDossierDraftSchema>;
+
+export const schoolDossierSourceSchema = schoolDossierSourceDraftSchema.extend({
+  id: schoolDossierSourceIdSchema,
+});
+export type SchoolDossierSource = z.infer<typeof schoolDossierSourceSchema>;
+
+export const schoolDossierSchema = z.object({
+  createdAt: rfc3339UtcSchema,
+  essayId: essayIdSchema,
+  id: schoolDossierIdSchema,
+  schemaVersion: z.literal("1"),
+  schoolId: schoolIdSchema,
+  sources: z.array(schoolDossierSourceSchema).min(1).max(20),
+  summary: z.string().trim().min(1).max(1_500),
+  updatedAt: rfc3339UtcSchema,
+  userId: userIdSchema,
+});
+export type SchoolDossier = z.infer<typeof schoolDossierSchema>;

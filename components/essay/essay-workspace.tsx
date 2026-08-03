@@ -8,6 +8,7 @@ import {
   essayWorkspaceSchema,
   type EssayWorkspace as EssayWorkspaceValue,
 } from "@/contracts/http/v1/essays";
+import { ResearchPanel } from "@/components/essay/research-panel";
 
 type Props = { essayId: string; initialWorkspace?: EssayWorkspaceValue };
 
@@ -99,9 +100,10 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
         <p>{workspace.essay.prompt}</p>
       </section>
       <p className="essay-next-step">
-        Your workspace is ready. Verified school research and strategy tools
-        arrive in the next guided step.
+        Your workspace is ready. Build a cited school evidence base before
+        choosing your strategy.
       </p>
+      <ResearchPanel essayId={workspace.essay.id} />
       <Link className="button button-secondary" href="/essays">
         Back to essays
       </Link>

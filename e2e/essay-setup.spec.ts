@@ -79,6 +79,10 @@ test("creates and reopens an essay using only a registry school name", async ({
       await route.fulfill({ json: envelope(workspace), status: 201 });
       return;
     }
+    if (url.pathname.endsWith("/research")) {
+      await route.fulfill({ status: 404 });
+      return;
+    }
     if (url.pathname === `/api/v1/essays/${essayId}`) {
       await route.fulfill({ json: envelope(workspace) });
       return;
