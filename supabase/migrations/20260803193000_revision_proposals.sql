@@ -1,3 +1,22 @@
+create function private.sha256_base64url(requested_text text)
+returns text
+language sql
+immutable
+strict
+set search_path = ''
+as $$
+  select pg_catalog.rtrim(
+    pg_catalog.translate(
+      pg_catalog.encode(
+        pg_catalog.sha256(pg_catalog.convert_to(requested_text, 'UTF8')),
+        'base64'
+      ),
+      '+/', '-_'
+    ),
+    '='
+  );
+$$;
+
 alter table private.ai_proposals
   add column selection_start integer,
   add column selection_end integer,
@@ -136,6 +155,7 @@ begin
     requested_selection_start is null or requested_selection_start < 0
     or requested_selection_end is null
     or requested_selection_end <= requested_selection_start
+    or requested_selection_end > char_length(current_essay.draft_text)
     or requested_selection_text_hash is null
     or requested_selection_text_hash !~ '^[A-Za-z0-9_-]{43}$'
     or requested_rewrite_instruction is null
@@ -151,8 +171,17 @@ begin
   ) then
     return jsonb_build_object('decision', 'STATE_CONFLICT', 'proposal', null);
   end if;
+  if requested_kind = 'REWRITE' and private.sha256_base64url(
+    pg_catalog.substring(
+      current_essay.draft_text from requested_selection_start + 1
+      for requested_selection_end - requested_selection_start
+    )
+  ) <> requested_selection_text_hash then
+    return jsonb_build_object('decision', 'REVISION_MISMATCH', 'proposal', null);
+  end if;
   if requested_kind = 'CONTINUATION' and (
     requested_cursor_offset is null or requested_cursor_offset < 0
+    or requested_cursor_offset > char_length(current_essay.draft_text)
     or requested_context_hash is null
     or requested_context_hash !~ '^[A-Za-z0-9_-]{43}$'
     or requested_selection_start is not null
@@ -163,6 +192,11 @@ begin
     or jsonb_array_length(requested_draft -> 'suggestions') not between 1 and 3
   ) then
     return jsonb_build_object('decision', 'STATE_CONFLICT', 'proposal', null);
+  end if;
+  if requested_kind = 'CONTINUATION'
+    and private.sha256_base64url(current_essay.draft_text) <> requested_context_hash
+  then
+    return jsonb_build_object('decision', 'REVISION_MISMATCH', 'proposal', null);
   end if;
 
   select * into current_operation from private.ai_operations
@@ -217,6 +251,9 @@ revoke execute on function private.commit_revision_proposal(
 ) from public, anon, authenticated;
 grant execute on function private.get_revision_proposal(uuid, uuid, text)
 to service_role;
+revoke execute on function private.sha256_base64url(text)
+from public, anon, authenticated;
+grant execute on function private.sha256_base64url(text) to service_role;
 grant execute on function private.commit_revision_proposal(
   uuid, uuid, text, integer, uuid, jsonb, integer, integer, text,
   integer, text, text, text, text, integer, integer, integer, integer, timestamptz

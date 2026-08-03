@@ -1349,6 +1349,62 @@ textarea:focus-visible {
   padding: 1rem 1.25rem;
 }
 
+.revision-proposal-panel {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.revision-proposal-panel h3,
+.proposal-diff h3,
+.proposal-diff h4 {
+  margin: 0;
+}
+
+.revision-proposal-panel label {
+  display: grid;
+  font-weight: 800;
+  gap: 0.4rem;
+}
+
+.revision-proposal-panel input,
+.revision-proposal-panel select {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: inherit;
+  font: inherit;
+  padding: 0.7rem;
+}
+
+.proposal-diff {
+  border-top: 2px solid var(--accent);
+  display: grid;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+
+.proposal-diff-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr));
+}
+
+.proposal-diff-grid section {
+  border: 1px solid var(--line);
+  min-width: 0;
+  padding: 1rem;
+}
+
+.proposal-diff-grid pre {
+  font: inherit;
+  line-height: 1.6;
+  margin-bottom: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
 .policy-page {
   margin: 0 auto;
   max-width: 72rem;

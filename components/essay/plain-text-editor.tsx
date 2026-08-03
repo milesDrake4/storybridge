@@ -1,7 +1,10 @@
 "use client";
 
+import { useState } from "react";
+
 import type { Essay } from "@/contracts/http/v1/essays";
 import { useAutosave } from "@/components/essay/use-autosave";
+import { RevisionProposalPanel } from "@/components/essay/revision-proposal-panel";
 
 type Props = {
   essayId: string;
@@ -25,6 +28,7 @@ const stateLabel = {
 } as const;
 
 export function PlainTextEditor(props: Props) {
+  const [selection, setSelection] = useState({ end: 0, start: 0 });
   const autosave = useAutosave({
     essayId: props.essayId,
     initialRevision: props.initialRevision,
@@ -56,6 +60,12 @@ export function PlainTextEditor(props: Props) {
           maxLength={20_000}
           onBlur={autosave.flush}
           onChange={(event) => autosave.setText(event.target.value)}
+          onSelect={(event) =>
+            setSelection({
+              end: event.currentTarget.selectionEnd,
+              start: event.currentTarget.selectionStart,
+            })
+          }
           spellCheck="true"
           value={autosave.text}
         />
@@ -115,6 +125,14 @@ export function PlainTextEditor(props: Props) {
           </div>
         </div>
       ) : null}
+      <RevisionProposalPanel
+        draftText={autosave.text}
+        essayId={props.essayId}
+        onAccepted={autosave.adoptServerEssay}
+        revision={autosave.currentRevision}
+        saved={autosave.state === "SAVED"}
+        selection={selection}
+      />
     </section>
   );
 }

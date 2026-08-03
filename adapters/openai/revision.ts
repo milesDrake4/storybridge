@@ -29,7 +29,7 @@ export const REWRITE_INSTRUCTIONS = `Rewrite only the selected text according to
 Keep the result proportionate to the selection: TIGHTEN must not add words; EXPAND may use at most twice the selected word count; other instructions may add at most 25 percent.
 ${EVIDENCE_RULES}`;
 
-export const CONTINUATION_INSTRUCTIONS = `Offer one to three distinct short continuations at the cursor, with no more than 100 words total.
+export const CONTINUATION_INSTRUCTIONS = `Offer one to three consecutive short continuation blocks at the cursor, with no more than 100 words total. The blocks are accepted together in their returned order.
 Do not repeat the existing draft or complete the entire essay.
 ${EVIDENCE_RULES}`;
 

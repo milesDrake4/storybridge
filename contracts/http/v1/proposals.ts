@@ -183,3 +183,8 @@ export const continuationProposalSchema = continuationDraftSchema.safeExtend({
   userId: userIdSchema,
 });
 export type ContinuationProposal = z.infer<typeof continuationProposalSchema>;
+
+export const acceptProposalInputSchema = z.strictObject({
+  expectedRevision: z.number().int().nonnegative(),
+});
+export type AcceptProposalInput = z.infer<typeof acceptProposalInputSchema>;
