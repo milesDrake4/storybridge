@@ -115,9 +115,12 @@ function dependencies(overrides: Record<string, unknown> = {}) {
     list: vi.fn(),
   } as EssayWorkspaceRepository;
   const dossiers = {
-    commit: vi.fn().mockResolvedValue({ type: "CREATED", value: dossier }),
+    commit: vi
+      .fn()
+      .mockResolvedValue({ essayRevision: 1, type: "CREATED", value: dossier }),
     findByEssay: vi.fn().mockResolvedValue(dossier),
     findById: vi.fn().mockResolvedValue(dossier),
+    refresh: vi.fn(),
   } satisfies SchoolDossierRepository;
   return {
     ...eligibility(),
@@ -156,7 +159,7 @@ describe("school dossier service", () => {
         deps,
         now,
       ),
-    ).resolves.toEqual(dossier);
+    ).resolves.toEqual({ dossier, essayRevision: 1 });
 
     expect(deps.research.research).toHaveBeenCalledWith({ school, userId });
     expect(deps.dossiers.commit).toHaveBeenCalledWith(
@@ -211,7 +214,7 @@ describe("school dossier service", () => {
         deps,
         now,
       ),
-    ).resolves.toEqual(dossier);
+    ).resolves.toEqual({ dossier, essayRevision: 0 });
     expect(deps.research.research).not.toHaveBeenCalled();
     expect(deps.dossiers.findById).toHaveBeenCalledWith(userId, dossierId);
   });
@@ -221,6 +224,7 @@ describe("school dossier service", () => {
       commit: vi.fn().mockResolvedValue({ type: "STATE_CONFLICT" }),
       findByEssay: vi.fn(),
       findById: vi.fn(),
+      refresh: vi.fn(),
     } satisfies SchoolDossierRepository;
     const deps = dependencies({ dossiers });
 
@@ -248,7 +252,12 @@ describe("school dossier service", () => {
 describe("school dossier HTTP contract", () => {
   it("requires idempotency before starting research", async () => {
     const create = vi.fn();
-    const response = await createDossierPostHandler({ appUrl, create })(
+    const refresh = vi.fn();
+    const response = await createDossierPostHandler({
+      appUrl,
+      create,
+      refresh,
+    })(
       new Request(`${appUrl}api/v1/essays/${essayId}/research`, {
         headers: {
           host: appUrl.host,

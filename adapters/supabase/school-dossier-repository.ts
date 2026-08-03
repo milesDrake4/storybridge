@@ -35,8 +35,15 @@ const dossierRowSchema = z.object({
 });
 
 const commitResultSchema = z.object({
-  decision: z.enum(["CREATED", "NOT_FOUND", "REPLAY", "STATE_CONFLICT"]),
+  decision: z.enum([
+    "CREATED",
+    "NOT_FOUND",
+    "REPLAY",
+    "REVISION_MISMATCH",
+    "STATE_CONFLICT",
+  ]),
   dossier: z.unknown().nullable(),
+  essay_revision: z.number().int().nonnegative().nullable(),
 });
 
 function timestamp(value: string): string {
@@ -72,6 +79,24 @@ export function createSupabaseSchoolDossierRepository(
   config: ServerConfig,
 ): SchoolDossierRepository {
   const client = createSupabaseSecretClient(config);
+  function decision(data: unknown): CommitSchoolDossierDecision {
+    const result = commitResultSchema.parse(data);
+    if (
+      result.decision === "NOT_FOUND" ||
+      result.decision === "REVISION_MISMATCH" ||
+      result.decision === "STATE_CONFLICT"
+    ) {
+      return { type: result.decision };
+    }
+    if (!result.dossier || result.essay_revision === null) {
+      throw new Error("Dossier commit result is missing");
+    }
+    return {
+      essayRevision: result.essay_revision,
+      type: result.decision,
+      value: mapDossier(result.dossier),
+    };
+  }
   return {
     async commit(input) {
       const { data, error } = await client
@@ -90,18 +115,7 @@ export function createSupabaseSchoolDossierRepository(
           requested_user_id: input.userId,
         });
       if (error) throw error;
-      const result = commitResultSchema.parse(data);
-      if (
-        result.decision === "NOT_FOUND" ||
-        result.decision === "STATE_CONFLICT"
-      ) {
-        return { type: result.decision } satisfies CommitSchoolDossierDecision;
-      }
-      if (!result.dossier) throw new Error("Dossier commit result is missing");
-      return {
-        type: result.decision,
-        value: mapDossier(result.dossier),
-      } satisfies CommitSchoolDossierDecision;
+      return decision(data);
     },
     async findByEssay(userId, essayId) {
       const { data, error } = await client
@@ -122,6 +136,26 @@ export function createSupabaseSchoolDossierRepository(
         });
       if (error) throw error;
       return data ? mapDossier(data) : null;
+    },
+    async refresh(input) {
+      const { data, error } = await client
+        .schema("private")
+        .rpc("refresh_school_dossier", {
+          requested_at: input.now.toISOString(),
+          requested_draft: input.draft,
+          requested_essay_id: input.essayId,
+          requested_expected_revision: input.expectedRevision,
+          requested_final_cost_cents: input.finalCostCents,
+          requested_input_tokens: input.inputTokens,
+          requested_latency_ms: input.latencyMs,
+          requested_model_id: input.modelId,
+          requested_operation_id: input.operationId,
+          requested_output_tokens: input.outputTokens,
+          requested_provider_request_id: input.providerRequestId,
+          requested_user_id: input.userId,
+        });
+      if (error) throw error;
+      return decision(data);
     },
   };
 }

@@ -73,3 +73,12 @@ export const schoolDossierSchema = z.object({
   userId: userIdSchema,
 });
 export type SchoolDossier = z.infer<typeof schoolDossierSchema>;
+
+export const researchInputSchema = z.discriminatedUnion("refresh", [
+  z.strictObject({ refresh: z.literal(false) }),
+  z.strictObject({
+    invalidateDependentWork: z.literal(true),
+    refresh: z.literal(true),
+  }),
+]);
+export type ResearchInput = z.infer<typeof researchInputSchema>;

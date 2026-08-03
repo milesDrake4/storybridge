@@ -10,9 +10,11 @@ import {
   apiErrorSchema,
   apiSuccessSchema,
 } from "@/contracts/http/v1/envelopes";
+import { RefreshResearchDialog } from "@/components/essay/refresh-research-dialog";
 
 type Props = {
   essayId: string;
+  essayRevision: number;
   initialDossier?: SchoolDossier | null;
 };
 
@@ -25,6 +27,8 @@ async function json(response: Response) {
 }
 
 function errorCopy(code: string | null): string {
+  if (code === "REVISION_MISMATCH")
+    return "This essay changed elsewhere. Reload the workspace before refreshing; your current research and dependent work were kept.";
   if (code === "AI_BUDGET_EXHAUSTED")
     return "Research is temporarily paused by the service budget. Try again later; your essay is unchanged.";
   if (code === "QUOTA_EXCEEDED")
@@ -34,11 +38,24 @@ function errorCopy(code: string | null): string {
   return "Research did not finish, so nothing was saved or changed. Try again when you are ready.";
 }
 
-export function ResearchPanel({ essayId, initialDossier }: Props) {
+function revisionFromEtag(etag: string | null, essayId: string): number | null {
+  const match = new RegExp(
+    `^"essay:${essayId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}:r([1-9][0-9]*)"$`,
+  ).exec(etag ?? "");
+  return match ? Number(match[1]) : null;
+}
+
+export function ResearchPanel({
+  essayId,
+  essayRevision,
+  initialDossier,
+}: Props) {
   const [dossier, setDossier] = useState(initialDossier ?? null);
+  const [currentRevision, setCurrentRevision] = useState(essayRevision);
   const [loading, setLoading] = useState(initialDossier === undefined);
   const [researching, setResearching] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
+  const [confirmingRefresh, setConfirmingRefresh] = useState(false);
   const pendingKey = useRef<string | null>(null);
 
   const load = useCallback(async () => {
@@ -71,13 +88,24 @@ export function ResearchPanel({ essayId, initialDossier }: Props) {
     return () => window.clearTimeout(timeout);
   }, [initialDossier, load]);
 
-  async function research() {
+  async function research(refresh = false) {
     setResearching(true);
     setNotice(null);
     pendingKey.current ??= crypto.randomUUID();
     try {
       const response = await fetch(`/api/v1/essays/${essayId}/research`, {
-        headers: { "idempotency-key": pendingKey.current },
+        body: JSON.stringify(
+          refresh
+            ? { invalidateDependentWork: true, refresh: true }
+            : { refresh: false },
+        ),
+        headers: {
+          "content-type": "application/json",
+          "idempotency-key": pendingKey.current,
+          ...(refresh
+            ? { "if-match": `"essay:${essayId}:r${currentRevision}"` }
+            : {}),
+        },
         method: "POST",
       });
       const body = await json(response);
@@ -92,6 +120,11 @@ export function ResearchPanel({ essayId, initialDossier }: Props) {
       if (!parsed.success) throw new Error();
       pendingKey.current = null;
       setDossier(parsed.data.data);
+      setCurrentRevision(
+        revisionFromEtag(response.headers.get("etag"), essayId) ??
+          currentRevision + 1,
+      );
+      setConfirmingRefresh(false);
     } catch {
       setNotice(errorCopy(null));
     } finally {
@@ -170,6 +203,25 @@ export function ResearchPanel({ essayId, initialDossier }: Props) {
               </li>
             ))}
           </ol>
+          {confirmingRefresh ? (
+            <RefreshResearchDialog
+              busy={researching}
+              onCancel={() => setConfirmingRefresh(false)}
+              onConfirm={() => void research(true)}
+            />
+          ) : (
+            <button
+              className="button button-secondary research-refresh-button"
+              disabled={researching}
+              onClick={() => {
+                setNotice(null);
+                setConfirmingRefresh(true);
+              }}
+              type="button"
+            >
+              Refresh school research
+            </button>
+          )}
         </div>
       )}
     </section>

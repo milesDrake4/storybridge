@@ -7,6 +7,7 @@ import {
   createEssayDossier,
   getEssayDossier,
 } from "@/services/research/create-dossier";
+import { refreshEssayDossier } from "@/services/research/refresh-dossier";
 
 type Context = { params: Promise<{ essayId: string }> };
 
@@ -23,5 +24,7 @@ export async function POST(request: Request, context: Context) {
     appUrl: config.appUrl,
     create: (essayId, metadata) =>
       createEssayDossier(essayId, metadata, dependencies),
+    refresh: (essayId, revision, metadata) =>
+      refreshEssayDossier(essayId, revision, metadata, dependencies),
   })(request, (await context.params).essayId);
 }

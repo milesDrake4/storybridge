@@ -39,13 +39,25 @@ function success(data: unknown) {
       data,
       meta: { requestId: "b9000000-0000-4000-8000-000000000001" },
     }),
-    { headers: { "content-type": "application/json" }, status: 201 },
+    {
+      headers: {
+        "content-type": "application/json",
+        etag: `"essay:${essayId}:r1"`,
+      },
+      status: 201,
+    },
   );
 }
 
 describe("cited school research panel", () => {
   it("shows category, excerpt, retrieval time, and a clickable citation for every claim", () => {
-    render(<ResearchPanel essayId={essayId} initialDossier={dossier} />);
+    render(
+      <ResearchPanel
+        essayId={essayId}
+        essayRevision={1}
+        initialDossier={dossier}
+      />,
+    );
 
     expect(screen.getByText("academics")).toBeVisible();
     expect(screen.getByRole("blockquote")).toHaveTextContent(
@@ -61,7 +73,13 @@ describe("cited school research panel", () => {
     const fetchMock = vi.fn().mockResolvedValue(success(dossier));
     vi.stubGlobal("fetch", fetchMock);
     const user = userEvent.setup();
-    render(<ResearchPanel essayId={essayId} initialDossier={null} />);
+    render(
+      <ResearchPanel
+        essayId={essayId}
+        essayRevision={0}
+        initialDossier={null}
+      />,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Research this school" }),
@@ -71,7 +89,11 @@ describe("cited school research panel", () => {
     expect(fetchMock).toHaveBeenCalledWith(
       `/api/v1/essays/${essayId}/research`,
       expect.objectContaining({
-        headers: { "idempotency-key": expect.any(String) },
+        body: JSON.stringify({ refresh: false }),
+        headers: expect.objectContaining({
+          "content-type": "application/json",
+          "idempotency-key": expect.any(String),
+        }),
         method: "POST",
       }),
     );
@@ -96,7 +118,13 @@ describe("cited school research panel", () => {
       ),
     );
     const user = userEvent.setup();
-    render(<ResearchPanel essayId={essayId} initialDossier={null} />);
+    render(
+      <ResearchPanel
+        essayId={essayId}
+        essayRevision={0}
+        initialDossier={null}
+      />,
+    );
     await user.click(
       screen.getByRole("button", { name: "Research this school" }),
     );
@@ -107,5 +135,96 @@ describe("cited school research panel", () => {
     expect(
       screen.getByRole("button", { name: "Retry school research" }),
     ).toBeVisible();
+  });
+
+  it("requires explicit confirmation and sends the current essay ETag", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(success(dossier));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    render(
+      <ResearchPanel
+        essayId={essayId}
+        essayRevision={1}
+        initialDossier={dossier}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Refresh school research" }),
+    );
+    const confirm = screen.getByRole("button", {
+      name: "Refresh and invalidate work",
+    });
+    expect(confirm).toBeDisabled();
+    expect(screen.getByRole("alertdialog")).toHaveTextContent(
+      "selected angle, outline, and pending AI suggestions",
+    );
+
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: /dependent strategy work will be invalidated/i,
+      }),
+    );
+    await user.click(confirm);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      `/api/v1/essays/${essayId}/research`,
+      expect.objectContaining({
+        body: JSON.stringify({
+          invalidateDependentWork: true,
+          refresh: true,
+        }),
+        headers: expect.objectContaining({
+          "if-match": `"essay:${essayId}:r1"`,
+          "idempotency-key": expect.any(String),
+        }),
+        method: "POST",
+      }),
+    );
+  });
+
+  it("keeps the prior dossier visible when a concurrent change returns 412", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            apiVersion: "1",
+            error: {
+              code: "REVISION_MISMATCH",
+              message: "The essay changed.",
+              retryable: false,
+            },
+            meta: { requestId: "b9000000-0000-4000-8000-000000000003" },
+          }),
+          { status: 412 },
+        ),
+      ),
+    );
+    const user = userEvent.setup();
+    render(
+      <ResearchPanel
+        essayId={essayId}
+        essayRevision={1}
+        initialDossier={dossier}
+      />,
+    );
+
+    await user.click(
+      screen.getByRole("button", { name: "Refresh school research" }),
+    );
+    await user.click(
+      screen.getByRole("checkbox", {
+        name: /dependent strategy work will be invalidated/i,
+      }),
+    );
+    await user.click(
+      screen.getByRole("button", { name: "Refresh and invalidate work" }),
+    );
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "current research and dependent work were kept",
+    );
+    expect(screen.getByText(dossier.sources[0].claim)).toBeVisible();
   });
 });
