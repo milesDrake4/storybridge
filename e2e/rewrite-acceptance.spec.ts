@@ -159,8 +159,16 @@ test("previews an exact rewrite and applies it only after acceptance", async ({
   await expect(
     page.getByRole("heading", { name: "Proposed rewrite" }),
   ).toBeVisible();
-  await expect(page.getByText(selectedText)).toBeVisible();
-  await expect(page.getByText("fixed bikes")).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Current text" })
+      .getByText(selectedText, { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole("region", { name: "Proposed text" })
+      .getByText("fixed bikes", { exact: true }),
+  ).toBeVisible();
   await expect(editor).toHaveValue(draftText);
   await page.getByRole("button", { name: "Accept this change" }).click();
   await expect(editor).toHaveValue("I fixed bikes with neighbors.");
