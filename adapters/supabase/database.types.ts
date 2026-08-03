@@ -216,6 +216,64 @@ export type Database = {
         };
         Relationships: [];
       };
+      entitlements: {
+        Row: {
+          created_at: string;
+          ends_at: string | null;
+          essay_limit: number;
+          id: string;
+          kind: string;
+          season: string;
+          starts_at: string;
+          status: string;
+          stripe_checkout_session_id: string | null;
+          updated_at: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          ends_at?: string | null;
+          essay_limit: number;
+          id?: string;
+          kind: string;
+          season: string;
+          starts_at?: string;
+          status?: string;
+          stripe_checkout_session_id?: string | null;
+          updated_at?: string;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["private"]["Tables"]["entitlements"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      essay_allowance_transactions: {
+        Row: {
+          created_at: string;
+          entitlement_id: string;
+          essay_id: string;
+          id: string;
+          idempotency_key_hmac: string;
+          request_hmac: string;
+          season: string;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          entitlement_id: string;
+          essay_id: string;
+          id?: string;
+          idempotency_key_hmac: string;
+          request_hmac: string;
+          season: string;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["private"]["Tables"]["essay_allowance_transactions"]["Insert"]
+        >;
+        Relationships: [];
+      };
       interview_questions: {
         Row: {
           coverage_key: string;
@@ -374,6 +432,36 @@ export type Database = {
           requested_user_id: string;
         };
         Returns: Json;
+      };
+      create_essay_workspace: {
+        Args: {
+          requested_at?: string;
+          requested_idempotency_key_hmac: string;
+          requested_prompt: string;
+          requested_request_hmac: string;
+          requested_school_id: string;
+          requested_season: string;
+          requested_user_id: string;
+          requested_word_limit: number;
+        };
+        Returns: Json;
+      };
+      delete_essay_workspace: {
+        Args: { requested_essay_id: string; requested_user_id: string };
+        Returns: boolean;
+      };
+      get_essay_workspace: {
+        Args: { requested_essay_id: string; requested_user_id: string };
+        Returns: Json;
+      };
+      list_essay_workspaces: {
+        Args: {
+          requested_after_id: string | null;
+          requested_after_updated_at: string | null;
+          requested_limit: number;
+          requested_user_id: string;
+        };
+        Returns: { essay: Json; school: Json }[];
       };
       delete_story_fact: {
         Args: { requested_fact_id: string; requested_user_id: string };
@@ -543,6 +631,40 @@ export type Database = {
   };
   public: {
     Tables: {
+      essays: {
+        Row: {
+          created_at: string;
+          dossier_id: string | null;
+          draft_text: string;
+          id: string;
+          outline: Json | null;
+          prompt: string;
+          revision: number;
+          school_id: string;
+          season: string;
+          status: string;
+          updated_at: string;
+          user_id: string;
+          word_limit: number;
+        };
+        Insert: {
+          created_at?: string;
+          dossier_id?: string | null;
+          draft_text?: string;
+          id?: string;
+          outline?: Json | null;
+          prompt: string;
+          revision?: number;
+          school_id: string;
+          season: string;
+          status?: string;
+          updated_at?: string;
+          user_id: string;
+          word_limit: number;
+        };
+        Update: Partial<Database["public"]["Tables"]["essays"]["Insert"]>;
+        Relationships: [];
+      };
       interview_messages: {
         Row: {
           content: string;

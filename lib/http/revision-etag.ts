@@ -1,4 +1,5 @@
 import {
+  type EssayId,
   storyProfileIdSchema,
   type StoryFactId,
   type StoryProfileId,
@@ -16,6 +17,7 @@ export class RevisionHeaderError extends Error {
 }
 
 type RevisionResource =
+  | { id: EssayId; kind: "essay" }
   | { id: StoryFactId; kind: "fact" }
   | { id: StoryProfileId; kind: "profile" };
 
