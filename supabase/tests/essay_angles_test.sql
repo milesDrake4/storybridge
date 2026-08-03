@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(36);
+select plan(50);
 
 select has_table('public', 'essay_angles', 'essay angles table exists');
 select has_table('public', 'angle_story_facts', 'angle fact links exist');
@@ -285,11 +285,99 @@ select is(
   'NOT_FOUND', 'an unrelated angle is masked as missing'
 );
 
+create temp table outline_operation as
+select operation_id from private.reserve_ai_operation(
+  'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+  'POST', '/api/v1/essays/{essayId}/outline-proposals', 'v1.' || repeat('m', 43),
+  'v1.' || repeat('n', 43), 'v1.' || repeat('o', 43), 'OUTLINE_GENERATION',
+  50, 20, 15000, 20, '2026-08-03T20:06:00Z'
+);
+select is(
+  private.start_ai_operation((select operation_id from outline_operation), '2026-08-03T20:06:01Z'),
+  'STARTED', 'outline generation starts'
+);
+create temp table outline_payload as
+select jsonb_build_object(
+  'rationale', 'Moves from a concrete experience to a school connection.',
+  'outline', jsonb_build_object(
+    'schemaVersion', '1',
+    'sections', jsonb_build_array(
+      jsonb_build_object('id', 'eb000000-0000-4000-8000-000000000001', 'purpose', 'Opening purpose', 'targetWords', 75, 'storyFactIds', jsonb_build_array('e0300000-0000-4000-8000-000000000001'), 'schoolSourceIds', jsonb_build_array(sources.id)),
+      jsonb_build_object('id', 'eb000000-0000-4000-8000-000000000002', 'purpose', 'Body purpose', 'targetWords', 75, 'storyFactIds', jsonb_build_array('e0300000-0000-4000-8000-000000000001'), 'schoolSourceIds', jsonb_build_array(sources.id)),
+      jsonb_build_object('id', 'eb000000-0000-4000-8000-000000000003', 'purpose', 'School connection', 'targetWords', 75, 'storyFactIds', jsonb_build_array('e0300000-0000-4000-8000-000000000001'), 'schoolSourceIds', jsonb_build_array(sources.id)),
+      jsonb_build_object('id', 'eb000000-0000-4000-8000-000000000004', 'purpose', 'Closing purpose', 'targetWords', 75, 'storyFactIds', jsonb_build_array('e0300000-0000-4000-8000-000000000001'), 'schoolSourceIds', jsonb_build_array(sources.id))
+    )
+  )
+) as payload
+from public.school_dossier_sources sources
+where sources.dossier_id = (select dossier_id from public.essays);
+create temp table outline_result as
+select private.commit_outline_proposal(
+  'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+  (select dossier_id from public.essays), (select id from selected_angle), 3,
+  (select operation_id from outline_operation), (select payload from outline_payload),
+  'outline-provider', 'outline-model', 200, 100, 800, 20, '2026-08-03T20:06:02Z'
+) as data;
+select is((select data ->> 'decision' from outline_result), 'CREATED', 'valid outline proposal commits');
+select is((select count(*) from private.ai_proposals), 1::bigint, 'one immutable proposal persists');
+select is((select target_revision from private.ai_proposals), 3, 'proposal binds the current essay revision');
+select is((select outline from public.essays), null::jsonb, 'proposal does not mutate the editable outline');
+select is((select status from private.ai_operations where id = (select operation_id from outline_operation)), 'SUCCEEDED', 'proposal and operation finalize atomically');
+select is(
+  private.commit_outline_proposal(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    (select dossier_id from public.essays), (select id from selected_angle), 3,
+    (select operation_id from outline_operation), '{}'::jsonb,
+    'changed', 'changed', 0, 0, 0, 0, '2026-08-03T20:06:03Z'
+  ) ->> 'decision',
+  'REPLAY', 'same operation replays the immutable proposal'
+);
+
+create temp table stale_outline_operation as
+select operation_id from private.reserve_ai_operation(
+  'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+  'POST', '/api/v1/essays/{essayId}/outline-proposals', 'v1.' || repeat('p', 43),
+  'v1.' || repeat('q', 43), 'v1.' || repeat('r', 43), 'OUTLINE_GENERATION',
+  50, 20, 15000, 20, '2026-08-03T20:07:00Z'
+);
+select is(private.start_ai_operation((select operation_id from stale_outline_operation), '2026-08-03T20:07:01Z'), 'STARTED', 'stale outline operation starts');
+select is(
+  private.commit_outline_proposal(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    (select dossier_id from public.essays), (select id from selected_angle), 2,
+    (select operation_id from stale_outline_operation), (select payload from outline_payload),
+    'stale-provider', 'outline-model', 200, 100, 800, 20, '2026-08-03T20:07:02Z'
+  ) ->> 'decision',
+  'REVISION_MISMATCH', 'stale target revision cannot persist a proposal'
+);
+select is((select count(*) from private.ai_proposals), 1::bigint, 'stale generation leaves the prior proposal only');
+
+create temp table invalid_outline_operation as
+select operation_id from private.reserve_ai_operation(
+  'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+  'POST', '/api/v1/essays/{essayId}/outline-proposals', 'v1.' || repeat('s', 43),
+  'v1.' || repeat('t', 43), 'v1.' || repeat('u', 43), 'OUTLINE_GENERATION',
+  50, 20, 15000, 20, '2026-08-03T20:08:00Z'
+);
+select is(private.start_ai_operation((select operation_id from invalid_outline_operation), '2026-08-03T20:08:01Z'), 'STARTED', 'invalid allocation operation starts');
+select is(
+  private.commit_outline_proposal(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    (select dossier_id from public.essays), (select id from selected_angle), 3,
+    (select operation_id from invalid_outline_operation),
+    jsonb_set((select payload from outline_payload), '{outline,sections,0,targetWords}', '1'::jsonb),
+    'invalid-provider', 'outline-model', 200, 100, 800, 20, '2026-08-03T20:08:02Z'
+  ) ->> 'decision',
+  'EVIDENCE_INVALID', 'out-of-bounds word allocation is rejected atomically'
+);
+select is((select count(*) from private.ai_proposals), 1::bigint, 'invalid allocation persists no proposal');
+
 select private.invalidate_essay_research_dependents(
   'e0000000-0000-4000-8000-000000000001', (select id from angle_essay)
 );
 select is((select count(*) from public.essay_angles), 0::bigint, 'research invalidation deletes prior angles');
 select is((select angle_generation_count from public.essays), 0::smallint, 'research invalidation resets generation allowance');
+select is((select status from private.ai_proposals), 'EXPIRED', 'research invalidation expires pending proposals');
 
 select * from finish();
 rollback;

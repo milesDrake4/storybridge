@@ -480,6 +480,25 @@ export type Database = {
         };
         Returns: Json;
       };
+      commit_outline_proposal: {
+        Args: {
+          requested_angle_id: string;
+          requested_at?: string;
+          requested_dossier_id: string;
+          requested_draft: Json;
+          requested_essay_id: string;
+          requested_final_cost_cents: number;
+          requested_input_tokens: number;
+          requested_latency_ms: number;
+          requested_model_id: string;
+          requested_operation_id: string;
+          requested_output_tokens: number;
+          requested_provider_request_id: string;
+          requested_target_revision: number;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       refresh_school_dossier: {
         Args: {
           requested_at?: string;
@@ -511,6 +530,10 @@ export type Database = {
           requested_operation_id?: string | null;
           requested_user_id: string;
         };
+        Returns: Json;
+      };
+      get_outline_proposal: {
+        Args: { requested_proposal_id: string; requested_user_id: string };
         Returns: Json;
       };
       select_essay_angle: {
