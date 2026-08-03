@@ -57,7 +57,7 @@ export async function proposeContinuation(
   const workspace = await dependencies.essays.get(userId, essayId);
   if (!workspace) throw new RevisionProposalError("RESOURCE_NOT_FOUND");
   const { draftText } = workspace.essay;
-  if (input.cursorOffset > draftText.length)
+  if (input.cursorOffset > Array.from(draftText).length)
     throw new RevisionProposalError("VALIDATION_ERROR");
   if (createDraftTextHash(draftText) !== input.contextHash)
     throw new RevisionProposalError("REVISION_MISMATCH");

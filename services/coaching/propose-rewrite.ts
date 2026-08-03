@@ -7,6 +7,7 @@ import type {
 } from "@/contracts/http/v1/proposals";
 import type { HmacSecrets } from "@/lib/config/server";
 import { createDraftTextHash } from "@/lib/security/draft-hash";
+import { sliceByCodePoints } from "@/lib/essay/apply-proposal";
 import type { AiOperationRepository } from "@/repositories/ai-operation-repository";
 import type { EssayWorkspaceRepository } from "@/repositories/essay-workspace-repository";
 import type { RevisionProposalRepository } from "@/repositories/revision-proposal-repository";
@@ -59,9 +60,9 @@ export async function proposeRewrite(
   if (!workspace) throw new RevisionProposalError("RESOURCE_NOT_FOUND");
   const { draftText } = workspace.essay;
   const { start, end, textHash } = input.selection;
-  if (end > draftText.length)
+  if (end > Array.from(draftText).length)
     throw new RevisionProposalError("VALIDATION_ERROR");
-  const selectedText = draftText.slice(start, end);
+  const selectedText = sliceByCodePoints(draftText, start, end);
   if (createDraftTextHash(selectedText) !== textHash) {
     throw new RevisionProposalError("REVISION_MISMATCH");
   }

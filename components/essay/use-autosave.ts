@@ -38,6 +38,7 @@ export function useAutosave({
   const [state, setState] = useState<AutosaveState>("SAVED");
   const [conflict, setConflict] = useState<Conflict | null>(null);
   const [recovered, setRecovered] = useState(false);
+  const [currentRevision, setCurrentRevision] = useState(initialRevision);
   const textRef = useRef(initialText);
   const savedText = useRef(initialText);
   const revision = useRef(initialRevision);
@@ -124,6 +125,7 @@ export function useAutosave({
       if (!mounted.current) return;
       savedText.current = value;
       revision.current = parsed.data.data.revision;
+      setCurrentRevision(parsed.data.data.revision);
       completed = true;
       onSaved?.(parsed.data.data);
       persistRecovery(textRef.current);
@@ -190,6 +192,7 @@ export function useAutosave({
   function useServerVersion() {
     if (!conflict) return;
     revision.current = conflict.revision;
+    setCurrentRevision(conflict.revision);
     savedText.current = conflict.serverText;
     textRef.current = conflict.serverText;
     setTextState(conflict.serverText);
@@ -212,8 +215,23 @@ export function useAutosave({
     if (latest) setConflict(latest);
   }
 
+  function adoptServerEssay(essay: Essay) {
+    revision.current = essay.revision;
+    setCurrentRevision(essay.revision);
+    savedText.current = essay.draftText;
+    textRef.current = essay.draftText;
+    setTextState(essay.draftText);
+    persistRecovery(essay.draftText);
+    setConflict(null);
+    setRecovered(false);
+    transition("SAVED");
+    onSaved?.(essay);
+  }
+
   return {
+    adoptServerEssay,
     conflict,
+    currentRevision: Math.max(currentRevision, initialRevision),
     flush,
     recovered,
     refreshConflict,

@@ -540,6 +540,20 @@ export type Database = {
         };
         Returns: Json;
       };
+      accept_revision_proposal: {
+        Args: {
+          requested_at?: string;
+          requested_essay_id: string;
+          requested_expected_current_draft: string;
+          requested_expected_revision: number;
+          requested_idempotency_key_hmac: string;
+          requested_next_draft: string;
+          requested_proposal_id: string;
+          requested_request_hmac: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       refresh_school_dossier: {
         Args: {
           requested_at?: string;
@@ -585,6 +599,14 @@ export type Database = {
         Args: {
           requested_kind: string;
           requested_proposal_id: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
+      find_proposal_acceptance_replay: {
+        Args: {
+          requested_idempotency_key_hmac: string;
+          requested_request_hmac: string;
           requested_user_id: string;
         };
         Returns: Json;

@@ -21,6 +21,7 @@ import { createOutlineGenerationAdapter } from "@/adapters/openai/outline-genera
 import { createCoachGenerationAdapter } from "@/adapters/openai/coach";
 import { createRevisionGenerationAdapter } from "@/adapters/openai/revision";
 import { createSupabaseRevisionProposalRepository } from "@/adapters/supabase/revision-proposal-repository";
+import { createSupabaseProposalAcceptanceRepository } from "@/adapters/supabase/proposal-acceptance-repository";
 import { parseServerConfig } from "@/lib/config/server";
 
 export async function createEssayWorkspaceRuntime() {
@@ -37,6 +38,7 @@ export async function createEssayWorkspaceRuntime() {
   return {
     config,
     dependencies: {
+      acceptance: createSupabaseProposalAcceptanceRepository(config),
       aiOperations: createSupabaseAiOperationRepository(config),
       adviceProposals: createSupabaseAdviceProposalRepository(config),
       angles: createSupabaseEssayAngleRepository(config),
