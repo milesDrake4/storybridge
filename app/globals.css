@@ -81,6 +81,11 @@ textarea {
   border-color: var(--accent-strong);
 }
 
+.button-danger {
+  background: #762b23;
+  color: var(--paper);
+}
+
 .button:focus-visible,
 a:focus-visible,
 input:focus-visible,
@@ -671,6 +676,40 @@ textarea:focus-visible {
   font-weight: 700;
   text-decoration: underline;
   text-underline-offset: 0.18em;
+}
+
+.research-refresh-button {
+  margin-top: 1rem;
+}
+
+.research-refresh-warning {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  border-radius: 0.75rem;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.research-refresh-warning h3 {
+  margin-top: 0;
+}
+
+.research-refresh-warning label {
+  align-items: flex-start;
+  display: flex;
+  gap: 0.625rem;
+  margin-top: 1rem;
+}
+
+.research-refresh-warning input {
+  margin-top: 0.2rem;
+}
+
+.research-refresh-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1rem;
 }
 
 @media (max-width: 30rem) {

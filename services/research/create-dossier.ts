@@ -23,6 +23,7 @@ type ResearchErrorCode = Extract<
   | "PROVIDER_INVALID_RESPONSE"
   | "PROVIDER_REFUSED"
   | "RESOURCE_NOT_FOUND"
+  | "REVISION_MISMATCH"
   | "SERVICE_UNAVAILABLE"
   | "STATE_CONFLICT"
 >;
@@ -50,6 +51,11 @@ type Dependencies = EligibilityDependencies & {
   research: SchoolResearchPort;
 };
 
+export type SchoolDossierResult = {
+  dossier: SchoolDossier;
+  essayRevision: number;
+};
+
 export async function getEssayDossier(
   essayId: EssayId,
   dependencies: Dependencies,
@@ -66,15 +72,37 @@ export async function createEssayDossier(
   request: { idempotencyKey: string; ipAddress: string },
   dependencies: Dependencies,
   now = new Date(),
-): Promise<SchoolDossier> {
+): Promise<SchoolDossierResult> {
+  return generateEssayDossier(essayId, request, dependencies, now);
+}
+
+export async function generateEssayDossier(
+  essayId: EssayId,
+  request: {
+    expectedRevision?: number;
+    idempotencyKey: string;
+    ipAddress: string;
+  },
+  dependencies: Dependencies,
+  now = new Date(),
+): Promise<SchoolDossierResult> {
   const { userId } = await requireProductEligibility(dependencies, now);
   const workspace = await dependencies.essays.get(userId, essayId);
   if (!workspace) throw new SchoolDossierError("RESOURCE_NOT_FOUND");
+  const refresh = request.expectedRevision !== undefined;
+  if (refresh && workspace.essay.dossierId === null) {
+    throw new SchoolDossierError("STATE_CONFLICT");
+  }
+  if (refresh && workspace.essay.revision !== request.expectedRevision) {
+    throw new SchoolDossierError("REVISION_MISMATCH");
+  }
   const reservation = await reserveAiOperation(
     {
       canonicalRequest: JSON.stringify({
         essayId,
+        refresh,
         schoolId: workspace.school.id,
+        ...(refresh ? { expectedRevision: request.expectedRevision } : {}),
       }),
       essayId,
       estimatedCostCents: 25,
@@ -107,7 +135,7 @@ export async function createEssayDossier(
       dossierId.data,
     );
     if (!replayed) throw new AiOperationError("STATE_CONFLICT");
-    return replayed;
+    return { dossier: replayed, essayRevision: workspace.essay.revision };
   }
 
   await startAiOperation(
@@ -170,13 +198,19 @@ export async function createEssayDossier(
   };
   let committed: Awaited<ReturnType<SchoolDossierRepository["commit"]>>;
   try {
-    committed = await dependencies.dossiers.commit({
+    const commit = {
       ...completion,
       draft: generation.value,
       essayId,
       now,
       userId,
-    });
+    };
+    committed = refresh
+      ? await dependencies.dossiers.refresh({
+          ...commit,
+          expectedRevision: request.expectedRevision!,
+        })
+      : await dependencies.dossiers.commit(commit);
   } catch (error) {
     await finalizeAiOperation(
       {
@@ -190,13 +224,26 @@ export async function createEssayDossier(
     ).catch(() => undefined);
     throw error;
   }
-  if (committed.type === "NOT_FOUND" || committed.type === "STATE_CONFLICT") {
+  if (
+    committed.type === "NOT_FOUND" ||
+    committed.type === "REVISION_MISMATCH" ||
+    committed.type === "STATE_CONFLICT"
+  ) {
     const code =
-      committed.type === "NOT_FOUND" ? "RESOURCE_NOT_FOUND" : "STATE_CONFLICT";
+      committed.type === "NOT_FOUND"
+        ? "RESOURCE_NOT_FOUND"
+        : committed.type === "REVISION_MISMATCH"
+          ? "REVISION_MISMATCH"
+          : "STATE_CONFLICT";
     await finalizeAiOperation(
       {
         ...completion,
-        httpStatus: code === "RESOURCE_NOT_FOUND" ? 404 : 409,
+        httpStatus:
+          code === "RESOURCE_NOT_FOUND"
+            ? 404
+            : code === "REVISION_MISMATCH"
+              ? 412
+              : 409,
         safeErrorCode: code,
         status: "FAILED",
       },
@@ -205,5 +252,8 @@ export async function createEssayDossier(
     );
     throw new SchoolDossierError(code);
   }
-  return committed.value;
+  return {
+    dossier: committed.value,
+    essayRevision: committed.essayRevision,
+  };
 }

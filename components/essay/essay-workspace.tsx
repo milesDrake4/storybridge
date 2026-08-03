@@ -103,7 +103,10 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
         Your workspace is ready. Build a cited school evidence base before
         choosing your strategy.
       </p>
-      <ResearchPanel essayId={workspace.essay.id} />
+      <ResearchPanel
+        essayId={workspace.essay.id}
+        essayRevision={workspace.essay.revision}
+      />
       <Link className="button button-secondary" href="/essays">
         Back to essays
       </Link>

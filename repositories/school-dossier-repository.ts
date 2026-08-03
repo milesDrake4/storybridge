@@ -10,27 +10,37 @@ import type {
 } from "@/contracts/domain/ids";
 
 export type CommitSchoolDossierDecision =
-  | { type: "CREATED" | "REPLAY"; value: SchoolDossier }
+  | {
+      essayRevision: number;
+      type: "CREATED" | "REPLAY";
+      value: SchoolDossier;
+    }
   | { type: "NOT_FOUND" }
+  | { type: "REVISION_MISMATCH" }
   | { type: "STATE_CONFLICT" };
 
+export type SchoolDossierCommitInput = {
+  draft: SchoolDossierDraft;
+  essayId: EssayId;
+  finalCostCents: number;
+  inputTokens: number;
+  latencyMs: number;
+  modelId: string;
+  now: Date;
+  operationId: AiOperationId;
+  outputTokens: number;
+  providerRequestId: string;
+  userId: UserId;
+};
+
 export interface SchoolDossierRepository {
-  commit(input: {
-    draft: SchoolDossierDraft;
-    essayId: EssayId;
-    finalCostCents: number;
-    inputTokens: number;
-    latencyMs: number;
-    modelId: string;
-    now: Date;
-    operationId: AiOperationId;
-    outputTokens: number;
-    providerRequestId: string;
-    userId: UserId;
-  }): Promise<CommitSchoolDossierDecision>;
+  commit(input: SchoolDossierCommitInput): Promise<CommitSchoolDossierDecision>;
   findByEssay(userId: UserId, essayId: EssayId): Promise<SchoolDossier | null>;
   findById(
     userId: UserId,
     dossierId: SchoolDossierId,
   ): Promise<SchoolDossier | null>;
+  refresh(
+    input: SchoolDossierCommitInput & { expectedRevision: number },
+  ): Promise<CommitSchoolDossierDecision>;
 }
