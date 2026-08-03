@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type SyntheticEvent } from "react";
 
 import type { Essay } from "@/contracts/http/v1/essays";
 import { useAutosave } from "@/components/essay/use-autosave";
@@ -36,6 +36,12 @@ export function PlainTextEditor(props: Props) {
     onSaved: props.onSaved,
   });
   const words = countWords(autosave.text);
+  function updateSelection(event: SyntheticEvent<HTMLTextAreaElement>) {
+    setSelection({
+      end: event.currentTarget.selectionEnd,
+      start: event.currentTarget.selectionStart,
+    });
+  }
 
   return (
     <section className="plain-text-editor" aria-labelledby="draft-heading">
@@ -60,12 +66,9 @@ export function PlainTextEditor(props: Props) {
           maxLength={20_000}
           onBlur={autosave.flush}
           onChange={(event) => autosave.setText(event.target.value)}
-          onSelect={(event) =>
-            setSelection({
-              end: event.currentTarget.selectionEnd,
-              start: event.currentTarget.selectionStart,
-            })
-          }
+          onKeyUp={updateSelection}
+          onPointerUp={updateSelection}
+          onSelect={updateSelection}
           spellCheck="true"
           value={autosave.text}
         />

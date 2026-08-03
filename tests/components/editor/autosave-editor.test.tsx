@@ -66,6 +66,26 @@ afterEach(() => {
 });
 
 describe("plain-text autosave editor", () => {
+  it("enables rewrite proposals after a keyboard selection", () => {
+    vi.stubGlobal("fetch", vi.fn());
+    render(
+      <PlainTextEditor
+        essayId={essayId}
+        initialRevision={3}
+        initialText="Saved draft"
+        wordLimit={300}
+      />,
+    );
+    const editor = screen.getByRole("textbox", { name: "Essay draft" });
+    const generate = screen.getByRole("button", { name: "Generate preview" });
+    expect(generate).toBeDisabled();
+
+    (editor as HTMLTextAreaElement).setSelectionRange(0, 5);
+    fireEvent.keyUp(editor, { key: "ArrowRight", shiftKey: true });
+
+    expect(generate).toBeEnabled();
+  });
+
   it("updates locally and begins one save after 750 ms", async () => {
     const pending = deferred<Response>();
     const fetchMock = vi.fn().mockReturnValue(pending.promise);
