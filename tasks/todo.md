@@ -53,8 +53,8 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 - [x] 26. Build the autosaving plain-text editor
 - [x] 27. Deliver advice-only coaching
 - [x] 28. Generate rewrite and continuation proposals
-- [ ] 29. Preview and atomically accept eligible proposals
-- [ ] Checkpoint 5: Student-led drafting green
+- [x] 29. Preview and atomically accept eligible proposals
+- [x] Checkpoint 5: Student-led drafting green
 
 ## Slice 6: Integrity-safe fallback and export
 
