@@ -31,7 +31,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 ## Slice 3: Essay setup and cited research
 
-- [ ] 15. Provide the verified school registry
+- [x] 15. Provide the verified school registry
 - [ ] 16. Create entitlement-aware essay workspaces
 - [ ] 17. Build essay dashboard and setup UI
 - [ ] 18. Implement privacy-separated school research adapter

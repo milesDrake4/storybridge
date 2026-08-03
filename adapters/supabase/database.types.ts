@@ -237,6 +237,43 @@ export type Database = {
         };
         Relationships: [];
       };
+      schools: {
+        Row: {
+          canonical_name: string;
+          created_at: string;
+          id: string;
+          normalized_domain: string;
+          official_domain: string;
+          status: string;
+          updated_at: string;
+          verification_source_url: string;
+          verified_at: string;
+          verifier_id: string;
+        };
+        Insert: {
+          canonical_name: string;
+          created_at?: string;
+          id?: string;
+          official_domain: string;
+          status?: string;
+          updated_at?: string;
+          verification_source_url: string;
+          verified_at: string;
+          verifier_id: string;
+        };
+        Update: {
+          canonical_name?: string;
+          created_at?: string;
+          id?: string;
+          official_domain?: string;
+          status?: string;
+          updated_at?: string;
+          verification_source_url?: string;
+          verified_at?: string;
+          verifier_id?: string;
+        };
+        Relationships: [];
+      };
       usage_reservations: {
         Row: {
           budget_month_start: string;
@@ -327,6 +364,17 @@ export type Database = {
         };
         Returns: Json;
       };
+      create_school_request: {
+        Args: {
+          requested_at?: string;
+          requested_idempotency_key_hmac: string;
+          requested_name: string;
+          requested_request_hmac: string;
+          requested_url: string | null;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       delete_story_fact: {
         Args: { requested_fact_id: string; requested_user_id: string };
         Returns: boolean;
@@ -385,6 +433,19 @@ export type Database = {
           requested_user_id: string;
         };
         Returns: Json;
+      };
+      search_schools: {
+        Args: {
+          requested_after_id: string | null;
+          requested_after_name: string | null;
+          requested_limit: number;
+          requested_query: string;
+        };
+        Returns: {
+          canonical_name: string;
+          id: string;
+          official_domain: string;
+        }[];
       };
       set_story_fact_suppression: {
         Args: {
@@ -597,6 +658,42 @@ export type Database = {
           responsible_use_version?: string;
           terms_version?: string;
           updated_at?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
+      school_requests: {
+        Row: {
+          created_at: string;
+          id: string;
+          idempotency_key_hmac: string;
+          name: string;
+          request_hmac: string;
+          status: string;
+          updated_at: string;
+          url: string | null;
+          user_id: string;
+        };
+        Insert: {
+          created_at?: string;
+          id?: string;
+          idempotency_key_hmac: string;
+          name: string;
+          request_hmac: string;
+          status?: string;
+          updated_at?: string;
+          url?: string | null;
+          user_id: string;
+        };
+        Update: {
+          created_at?: string;
+          id?: string;
+          idempotency_key_hmac?: string;
+          name?: string;
+          request_hmac?: string;
+          status?: string;
+          updated_at?: string;
+          url?: string | null;
           user_id?: string;
         };
         Relationships: [];
