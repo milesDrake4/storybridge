@@ -58,7 +58,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 ## Slice 6: Integrity-safe fallback and export
 
-- [ ] 30. Generate one read-only reference draft
+- [x] 30. Generate one read-only reference draft
 - [ ] 31. Present reference claims and record immutable decisions
 - [ ] 32. Persist current-revision audits and deterministic similarity
 - [ ] 33. Deliver final review and student-draft-only export
