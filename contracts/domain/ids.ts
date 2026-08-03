@@ -27,6 +27,13 @@ export type SchoolDossierSourceId = z.infer<typeof schoolDossierSourceIdSchema>;
 export const aiOperationIdSchema = canonicalUuidSchema.brand<"AiOperationId">();
 export type AiOperationId = z.infer<typeof aiOperationIdSchema>;
 
+export const aiProposalIdSchema = canonicalUuidSchema.brand<"AiProposalId">();
+export type AiProposalId = z.infer<typeof aiProposalIdSchema>;
+
+export const outlineSectionIdSchema =
+  canonicalUuidSchema.brand<"OutlineSectionId">();
+export type OutlineSectionId = z.infer<typeof outlineSectionIdSchema>;
+
 export const interviewSessionIdSchema =
   canonicalUuidSchema.brand<"InterviewSessionId">();
 export type InterviewSessionId = z.infer<typeof interviewSessionIdSchema>;

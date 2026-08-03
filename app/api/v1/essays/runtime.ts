@@ -14,6 +14,8 @@ import {
 import { createSchoolResearchAdapter } from "@/adapters/openai/school-research";
 import { createAngleGenerationAdapter } from "@/adapters/openai/angle-generator";
 import { createSupabaseStoryVaultRepository } from "@/adapters/supabase/story-vault-repository";
+import { createSupabaseOutlineProposalRepository } from "@/adapters/supabase/outline-proposal-repository";
+import { createOutlineGenerationAdapter } from "@/adapters/openai/outline-generator";
 import { parseServerConfig } from "@/lib/config/server";
 
 export async function createEssayWorkspaceRuntime() {
@@ -51,6 +53,8 @@ export async function createEssayWorkspaceRuntime() {
         dailyAiCallLimit: config.dailyAiCallLimit,
         monthlyOpenAiBudgetCents: config.monthlyOpenAiBudgetCents,
       },
+      outlineGenerator: createOutlineGenerationAdapter(openAi.structured),
+      outlineProposals: createSupabaseOutlineProposalRepository(config),
       session: createSupabaseAuthenticatedSession(
         config,
         toSupabaseCookieMethods(await cookies()),
