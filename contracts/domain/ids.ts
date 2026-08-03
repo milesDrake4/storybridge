@@ -30,3 +30,10 @@ export type StoryProfileId = z.infer<typeof storyProfileIdSchema>;
 
 export const storyFactIdSchema = canonicalUuidSchema.brand<"StoryFactId">();
 export type StoryFactId = z.infer<typeof storyFactIdSchema>;
+
+export const schoolIdSchema = canonicalUuidSchema.brand<"SchoolId">();
+export type SchoolId = z.infer<typeof schoolIdSchema>;
+
+export const schoolRequestIdSchema =
+  canonicalUuidSchema.brand<"SchoolRequestId">();
+export type SchoolRequestId = z.infer<typeof schoolRequestIdSchema>;
