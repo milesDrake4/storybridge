@@ -44,6 +44,7 @@ export default async function ProductLayout({
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/interview">Interview</Link>
           <Link href="/story-vault">Story Vault</Link>
+          <Link href="/essays">Essays</Link>
         </nav>
         <main className="product-main">{children}</main>
       </div>

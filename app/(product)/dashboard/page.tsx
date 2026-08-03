@@ -12,6 +12,9 @@ export default function DashboardPage() {
       <Link className="button button-primary" href="/interview">
         Start or resume interview
       </Link>
+      <Link className="button button-secondary dashboard-essays" href="/essays">
+        Open essay workspace
+      </Link>
       <div className="empty-note">
         <span aria-hidden="true">01</span>
         <p>Only server-confirmed answers are added to your interview.</p>
