@@ -1243,6 +1243,78 @@ textarea:focus-visible {
   gap: 0.5rem;
 }
 
+.plain-text-editor {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+}
+
+.plain-text-editor > header,
+.draft-footer {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.plain-text-editor h2 {
+  margin: 0.25rem 0 0;
+}
+
+.save-state {
+  font-size: 0.9rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.save-state.SAVED {
+  color: #2f6d52;
+}
+
+.save-state.CONFLICT,
+.save-state.FAILED {
+  color: #8f3128;
+}
+
+.draft-field {
+  display: grid;
+  font-weight: 800;
+  gap: 0.5rem;
+}
+
+.draft-field textarea {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  color: inherit;
+  font: inherit;
+  line-height: 1.7;
+  min-height: min(60vh, 34rem);
+  padding: clamp(1rem, 3vw, 1.5rem);
+  resize: vertical;
+}
+
+.draft-footer p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.draft-conflict {
+  background: #fff3ef;
+  border: 1px solid #c66a5e;
+  padding: 1rem;
+}
+
+.draft-conflict h3 {
+  margin-top: 0;
+}
+
+.draft-conflict pre {
+  max-height: 12rem;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
 .policy-page {
   margin: 0 auto;
   max-width: 72rem;

@@ -12,6 +12,7 @@ import {
 import { ResearchPanel } from "@/components/essay/research-panel";
 import { AnglePicker } from "@/components/essay/angle-picker";
 import { OutlineEditor } from "@/components/essay/outline-editor";
+import { PlainTextEditor } from "@/components/essay/plain-text-editor";
 
 type Props = { essayId: string; initialWorkspace?: EssayWorkspaceValue };
 
@@ -153,6 +154,19 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
         }
         onRevisionChange={updateRevision}
       />
+      {workspace.essay.outline ? (
+        <PlainTextEditor
+          essayId={workspace.essay.id}
+          initialRevision={workspace.essay.revision}
+          initialText={workspace.essay.draftText}
+          wordLimit={workspace.essay.wordLimit}
+          onSaved={(essay) =>
+            setWorkspace((current) =>
+              current ? { ...current, essay } : current,
+            )
+          }
+        />
+      ) : null}
       <Link className="button button-secondary" href="/essays">
         Back to essays
       </Link>
