@@ -567,6 +567,20 @@ export type Database = {
         };
         Returns: Json;
       };
+      save_essay_draft: {
+        Args: {
+          requested_accepted_proposal_id: string | null;
+          requested_at?: string;
+          requested_draft_text: string | null;
+          requested_essay_id: string;
+          requested_expected_revision: number;
+          requested_origin: string;
+          requested_outline: Json | null;
+          requested_status: string | null;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       get_school_dossier: {
         Args: { requested_dossier_id: string; requested_user_id: string };
         Returns: Json;
@@ -788,6 +802,32 @@ export type Database = {
           word_limit: number;
         };
         Update: Partial<Database["public"]["Tables"]["essays"]["Insert"]>;
+        Relationships: [];
+      };
+      essay_versions: {
+        Row: {
+          accepted_proposal_id: string | null;
+          created_at: string;
+          draft_text: string;
+          essay_id: string;
+          id: string;
+          origin: string;
+          revision: number;
+          user_id: string;
+        };
+        Insert: {
+          accepted_proposal_id?: string | null;
+          created_at?: string;
+          draft_text: string;
+          essay_id: string;
+          id?: string;
+          origin: string;
+          revision: number;
+          user_id: string;
+        };
+        Update: Partial<
+          Database["public"]["Tables"]["essay_versions"]["Insert"]
+        >;
         Relationships: [];
       };
       interview_messages: {

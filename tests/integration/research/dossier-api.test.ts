@@ -100,6 +100,7 @@ function dependencies(overrides: Record<string, unknown> = {}) {
       essay: {
         createdAt: now.toISOString(),
         dossierId: null,
+        draftText: "",
         id: essayId,
         outline: null,
         prompt: "Describe a community that has shaped your perspective.",

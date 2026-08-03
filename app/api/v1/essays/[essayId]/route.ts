@@ -9,6 +9,7 @@ import {
   getEssayWorkspace,
 } from "@/services/essays/manage-workspaces";
 import { saveEssayOutline } from "@/services/essays/save-outline";
+import { saveEssayDraft } from "@/services/essays/save-draft";
 
 type Context = { params: Promise<{ essayId: string }> };
 
@@ -31,7 +32,27 @@ export async function PATCH(request: Request, context: Context) {
   const { config, dependencies } = await createEssayWorkspaceRuntime();
   return createEssayPatchHandler({
     appUrl: config.appUrl,
-    update: (essayId, revision, outline) =>
-      saveEssayOutline(essayId, revision, outline, dependencies),
+    update: (essayId, revision, patch) => {
+      if (patch.outline !== undefined) {
+        if (patch.draftText === undefined && patch.status === undefined) {
+          return saveEssayOutline(
+            essayId,
+            revision,
+            patch.outline,
+            dependencies,
+          );
+        }
+      }
+      return saveEssayDraft(
+        essayId,
+        revision,
+        {
+          draftText: patch.draftText,
+          outline: patch.outline,
+          status: patch.status,
+        },
+        dependencies,
+      );
+    },
   })(request, (await context.params).essayId);
 }

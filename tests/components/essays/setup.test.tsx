@@ -81,6 +81,7 @@ describe("essay setup", () => {
       essay: {
         createdAt: now,
         dossierId: null,
+        draftText: "",
         id: essay.id,
         outline: null,
         prompt: "Describe a community that has shaped your perspective.",

@@ -114,6 +114,7 @@ describe("outline proposal and editing", () => {
             envelope({
               createdAt: now,
               dossierId: "b7000000-0000-4000-8000-000000000001",
+              draftText: "",
               id: essayId,
               outline,
               prompt:

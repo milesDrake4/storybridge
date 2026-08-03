@@ -62,6 +62,7 @@ test("explicitly copies, edits, saves, and reloads an outline", async ({
   const essay = () => ({
     createdAt: now,
     dossierId,
+    draftText: "",
     id: essayId,
     outline: savedOutline,
     prompt: "How will your experiences help you contribute to our community?",

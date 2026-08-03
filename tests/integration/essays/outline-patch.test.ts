@@ -22,6 +22,7 @@ const outline: OutlineV1 = {
 const essay = {
   createdAt: "2026-08-03T20:00:00.000Z",
   dossierId: "c5000000-0000-4000-8000-000000000001",
+  draftText: "",
   id: essayId,
   outline,
   prompt: "Describe a community that shaped how you contribute today.",
@@ -68,7 +69,7 @@ describe("ETag-safe outline patch", () => {
     );
     expect(response.status).toBe(200);
     expect(response.headers.get("etag")).toBe(`"essay:${essayId}:r4"`);
-    expect(update).toHaveBeenCalledWith(essayId, 3, outline);
+    expect(update).toHaveBeenCalledWith(essayId, 3, { outline });
     await expect(response.json()).resolves.toMatchObject({
       data: { outline, revision: 4, status: "DRAFTING" },
     });

@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { createSupabaseAuthenticatedSession } from "@/adapters/supabase/auth";
 import { toSupabaseCookieMethods } from "@/adapters/supabase/next-cookies";
 import { createSupabaseEssayWorkspaceRepository } from "@/adapters/supabase/essay-workspace-repository";
+import { createSupabaseEssayVersionRepository } from "@/adapters/supabase/essay-version-repository";
 import { createSupabaseProfileRepository } from "@/adapters/supabase/profile-repository";
 import { createSupabaseAiOperationRepository } from "@/adapters/supabase/ai-operation-repository";
 import { createSupabaseEssayAngleRepository } from "@/adapters/supabase/essay-angle-repository";
@@ -36,6 +37,7 @@ export async function createEssayWorkspaceRuntime() {
       angles: createSupabaseEssayAngleRepository(config),
       cursorSecret: config.hmacSecrets.idempotency,
       essays: createSupabaseEssayWorkspaceRepository(config),
+      versions: createSupabaseEssayVersionRepository(config),
       dossiers: createSupabaseSchoolDossierRepository(config),
       hmacSecrets: config.hmacSecrets,
       profiles: createSupabaseProfileRepository(config),
