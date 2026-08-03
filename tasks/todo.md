@@ -34,7 +34,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 - [x] 15. Provide the verified school registry
 - [ ] 16. Create entitlement-aware essay workspaces
 - [ ] 17. Build essay dashboard and setup UI
-- [ ] 18. Implement privacy-separated school research adapter
+- [x] 18. Implement privacy-separated school research adapter
 - [ ] 19. Persist and display a cited school dossier
 - [ ] 20. Make dossier refresh invalidate dependents atomically
 - [ ] Checkpoint 3: Essay setup and research green
