@@ -34,6 +34,10 @@ export type AiOperationId = z.infer<typeof aiOperationIdSchema>;
 export const aiProposalIdSchema = canonicalUuidSchema.brand<"AiProposalId">();
 export type AiProposalId = z.infer<typeof aiProposalIdSchema>;
 
+export const proposalClaimIdSchema =
+  canonicalUuidSchema.brand<"ProposalClaimId">();
+export type ProposalClaimId = z.infer<typeof proposalClaimIdSchema>;
+
 export const outlineSectionIdSchema =
   canonicalUuidSchema.brand<"OutlineSectionId">();
 export type OutlineSectionId = z.infer<typeof outlineSectionIdSchema>;

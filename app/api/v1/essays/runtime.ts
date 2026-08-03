@@ -20,7 +20,9 @@ import { createSupabaseAdviceProposalRepository } from "@/adapters/supabase/advi
 import { createOutlineGenerationAdapter } from "@/adapters/openai/outline-generator";
 import { createCoachGenerationAdapter } from "@/adapters/openai/coach";
 import { createRevisionGenerationAdapter } from "@/adapters/openai/revision";
+import { createReferenceDraftGenerationAdapter } from "@/adapters/openai/reference-draft";
 import { createSupabaseRevisionProposalRepository } from "@/adapters/supabase/revision-proposal-repository";
+import { createSupabaseReferenceDraftRepository } from "@/adapters/supabase/reference-draft-repository";
 import { createSupabaseProposalAcceptanceRepository } from "@/adapters/supabase/proposal-acceptance-repository";
 import { parseServerConfig } from "@/lib/config/server";
 
@@ -52,6 +54,10 @@ export async function createEssayWorkspaceRuntime() {
       coachGenerator: createCoachGenerationAdapter(openAi.structured),
       revisionGenerator: createRevisionGenerationAdapter(openAi.structured),
       revisionProposals: createSupabaseRevisionProposalRepository(config),
+      referenceDraftGenerator: createReferenceDraftGenerationAdapter(
+        openAi.structured,
+      ),
+      referenceDrafts: createSupabaseReferenceDraftRepository(config),
       research: createSchoolResearchAdapter(
         {
           contentHmacSecret: config.hmacSecrets.content,

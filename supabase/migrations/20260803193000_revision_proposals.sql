@@ -173,8 +173,9 @@ begin
   end if;
   if requested_kind = 'REWRITE' and private.sha256_base64url(
     pg_catalog.substring(
-      current_essay.draft_text from requested_selection_start + 1
-      for requested_selection_end - requested_selection_start
+      current_essay.draft_text,
+      requested_selection_start + 1,
+      requested_selection_end - requested_selection_start
     )
   ) <> requested_selection_text_hash then
     return jsonb_build_object('decision', 'REVISION_MISMATCH', 'proposal', null);

@@ -45,12 +45,14 @@ insert into private.beta_invitations (
 );
 
 insert into public.interview_sessions (
-  id, user_id, status, coverage, current_question_key, completed_at
+  id, user_id, status, coverage, current_question_key, completed_at,
+  created_at, updated_at
 ) values (
   'e0100000-0000-4000-8000-000000000001',
   'e0000000-0000-4000-8000-000000000001', 'COMPLETE',
   '{"academicInterests":true,"experiences":2,"activities":true,"responsibilities":true,"values":true,"goals":true,"voice":true}'::jsonb,
-  null, '2026-08-03T20:00:00Z'
+  null, '2026-08-03T20:00:00Z',
+  '2026-08-03T20:00:00Z', '2026-08-03T20:00:00Z'
 );
 insert into public.story_profiles (
   id, user_id, source_session_id, version, status, voice_profile

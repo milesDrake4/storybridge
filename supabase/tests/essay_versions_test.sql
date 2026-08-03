@@ -26,16 +26,31 @@ select ok(
   ),
   'browser roles cannot invoke draft persistence directly'
 );
-select has_check(
-  'public', 'essay_versions', 'essay_versions_origin_check',
+select ok(
+  exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.essay_versions'::regclass
+      and conname = 'essay_versions_origin_check'
+      and contype = 'c'
+  ),
   'version origins are constrained'
 );
-select has_check(
-  'public', 'essay_versions', 'essay_versions_proposal_origin_check',
+select ok(
+  exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.essay_versions'::regclass
+      and conname = 'essay_versions_proposal_origin_check'
+      and contype = 'c'
+  ),
   'accepted proposal snapshots require a proposal ID and autosaves forbid one'
 );
-select has_fk(
-  'public', 'essay_versions', 'essay_versions_accepted_proposal_fk',
+select ok(
+  exists (
+    select 1 from pg_constraint
+    where conrelid = 'public.essay_versions'::regclass
+      and conname = 'essay_versions_accepted_proposal_fk'
+      and contype = 'f'
+  ),
   'accepted proposal snapshots bind to the same owned essay'
 );
 

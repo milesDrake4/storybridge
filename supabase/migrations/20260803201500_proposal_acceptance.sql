@@ -135,8 +135,9 @@ begin
     if current_proposal.selection_end > char_length(current_essay.draft_text)
       or private.sha256_base64url(
         pg_catalog.substring(
-          current_essay.draft_text from current_proposal.selection_start + 1
-          for current_proposal.selection_end - current_proposal.selection_start
+          current_essay.draft_text,
+          current_proposal.selection_start + 1,
+          current_proposal.selection_end - current_proposal.selection_start
         )
       ) <> current_proposal.selection_text_hash
     then
@@ -146,10 +147,10 @@ begin
     end if;
     computed_next_draft :=
       pg_catalog.substring(
-        current_essay.draft_text from 1 for current_proposal.selection_start
+        current_essay.draft_text, 1, current_proposal.selection_start
       ) || (current_proposal.proposed_content ->> 'proposedText') ||
       pg_catalog.substring(
-        current_essay.draft_text from current_proposal.selection_end + 1
+        current_essay.draft_text, current_proposal.selection_end + 1
       );
   else
     if current_proposal.cursor_offset > char_length(current_essay.draft_text)
@@ -166,10 +167,10 @@ begin
       current_proposal.proposed_content -> 'suggestions'
     ) with ordinality;
     preceding_text := pg_catalog.substring(
-      current_essay.draft_text from 1 for current_proposal.cursor_offset
+      current_essay.draft_text, 1, current_proposal.cursor_offset
     );
     following_text := pg_catalog.substring(
-      current_essay.draft_text from current_proposal.cursor_offset + 1
+      current_essay.draft_text, current_proposal.cursor_offset + 1
     );
     computed_next_draft := preceding_text ||
       case when preceding_text <> '' and preceding_text !~ E'[ \n]$'
