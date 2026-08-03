@@ -108,14 +108,14 @@ test("reviews sources and applies explicit fact privacy controls", async ({
   await page.getByText("View 1 interview source").click();
   await expect(page.getByText("I value careful work.")).toBeVisible();
   await page.getByRole("button", { name: "Verify" }).click();
-  await expect(page.getByText("verified")).toBeVisible();
+  await expect(page.getByText("verified", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Hide from AI" }).click();
   await expect(
     page.getByRole("button", { name: "Restore to AI" }),
   ).toBeVisible();
 
   await page.reload();
-  await expect(page.getByText("verified")).toBeVisible();
+  await expect(page.getByText("verified", { exact: true })).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Restore to AI" }),
   ).toBeVisible();
