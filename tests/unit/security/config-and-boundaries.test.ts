@@ -52,6 +52,21 @@ describe("server configuration", () => {
     expect(config.seasonPassPriceCents).toBe(2499);
   });
 
+  it("allows HTTP Supabase only on loopback for local development", () => {
+    const local = parseServerConfig({
+      ...validEnvironment,
+      NEXT_PUBLIC_SUPABASE_URL: "http://127.0.0.1:54321",
+    });
+
+    expect(local.supabaseUrl.href).toBe("http://127.0.0.1:54321/");
+    expect(() =>
+      parseServerConfig({
+        ...validEnvironment,
+        NEXT_PUBLIC_SUPABASE_URL: "http://supabase.internal:54321",
+      }),
+    ).toThrow("URL must use HTTPS or loopback HTTP");
+  });
+
   it("fails closed for missing, equal, or short HMAC secrets", () => {
     expect(() =>
       parseServerConfig({ ...validEnvironment, IP_HMAC_SECRET: undefined }),
