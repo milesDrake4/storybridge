@@ -40,6 +40,7 @@ export const apiErrorSchema = z.object({
     message: z.string().min(1),
     retryable: z.boolean(),
     fieldErrors: z.array(fieldErrorSchema).optional(),
+    followUpQuestion: z.string().min(1).max(300).optional(),
     resetAt: rfc3339UtcSchema.optional(),
   }),
   meta: responseMetaSchema,

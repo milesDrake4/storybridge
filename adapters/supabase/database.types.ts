@@ -462,6 +462,24 @@ export type Database = {
         };
         Returns: Json;
       };
+      commit_essay_angles: {
+        Args: {
+          requested_angles: Json;
+          requested_at?: string;
+          requested_dossier_id: string;
+          requested_essay_id: string;
+          requested_final_cost_cents: number;
+          requested_input_tokens: number;
+          requested_latency_ms: number;
+          requested_model_id: string;
+          requested_operation_id: string;
+          requested_output_tokens: number;
+          requested_provider_request_id: string;
+          requested_regenerate: boolean;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       refresh_school_dossier: {
         Args: {
           requested_at?: string;
@@ -485,6 +503,14 @@ export type Database = {
       };
       get_essay_workspace: {
         Args: { requested_essay_id: string; requested_user_id: string };
+        Returns: Json;
+      };
+      get_essay_angles: {
+        Args: {
+          requested_essay_id: string;
+          requested_operation_id?: string | null;
+          requested_user_id: string;
+        };
         Returns: Json;
       };
       get_school_dossier: {
@@ -674,6 +700,7 @@ export type Database = {
     Tables: {
       essays: {
         Row: {
+          angle_generation_count: number;
           created_at: string;
           dossier_id: string | null;
           draft_text: string;
@@ -682,6 +709,7 @@ export type Database = {
           prompt: string;
           revision: number;
           school_id: string;
+          selected_angle_id: string | null;
           season: string;
           status: string;
           updated_at: string;
@@ -689,6 +717,7 @@ export type Database = {
           word_limit: number;
         };
         Insert: {
+          angle_generation_count?: number;
           created_at?: string;
           dossier_id?: string | null;
           draft_text?: string;
@@ -697,6 +726,7 @@ export type Database = {
           prompt: string;
           revision?: number;
           school_id: string;
+          selected_angle_id?: string | null;
           season: string;
           status?: string;
           updated_at?: string;
