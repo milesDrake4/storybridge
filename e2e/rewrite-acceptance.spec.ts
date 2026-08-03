@@ -22,6 +22,18 @@ const userId = "ca000000-0000-4000-8000-000000000001";
 const essayId = "ca100000-0000-4000-8000-000000000001";
 const proposalId = "ca200000-0000-4000-8000-000000000001";
 const schoolId = "ca300000-0000-4000-8000-000000000001";
+const sourceId = "ca400000-0000-4000-8000-000000000001";
+const factId = "ca500000-0000-4000-8000-000000000001";
+const outline = {
+  schemaVersion: "1",
+  sections: [1, 2, 3].map((position) => ({
+    id: `ca600000-0000-4000-8000-00000000000${position}`,
+    purpose: `Purpose ${position}`,
+    schoolSourceIds: [sourceId],
+    storyFactIds: [factId],
+    targetWords: 100,
+  })),
+};
 const draftText = "I repaired bicycles with neighbors.";
 const selectedText = "repaired bicycles";
 const start = draftText.indexOf(selectedText);
@@ -38,10 +50,10 @@ test("previews an exact rewrite and applies it only after acceptance", async ({
   let savedText = draftText;
   const essay = () => ({
     createdAt: now,
-    dossierId: "ca400000-0000-4000-8000-000000000001",
+    dossierId: "ca700000-0000-4000-8000-000000000001",
     draftText: savedText,
     id: essayId,
-    outline: { schemaVersion: "1", sections: [] },
+    outline,
     prompt: "Describe how you will contribute to this campus community.",
     revision,
     schoolId,
