@@ -1178,6 +1178,71 @@ textarea:focus-visible {
   width: 100%;
 }
 
+.outline-editor {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+}
+
+.outline-editor header h2,
+.outline-proposal h3,
+.outline-draft h3 {
+  margin: 0.25rem 0 0;
+}
+
+.outline-proposal,
+.outline-draft {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.outline-proposal ol {
+  display: grid;
+  gap: 0.5rem;
+  padding-left: 1.25rem;
+}
+
+.outline-draft {
+  display: grid;
+  gap: 1rem;
+}
+
+.outline-draft fieldset {
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 1rem;
+}
+
+.outline-draft label {
+  display: grid;
+  font-weight: 700;
+  gap: 0.35rem;
+}
+
+.outline-draft input,
+.outline-draft textarea {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  color: inherit;
+  font: inherit;
+  padding: 0.7rem;
+}
+
+.outline-draft textarea {
+  min-height: 5rem;
+  resize: vertical;
+}
+
+.outline-section-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .policy-page {
   margin: 0 auto;
   max-width: 72rem;

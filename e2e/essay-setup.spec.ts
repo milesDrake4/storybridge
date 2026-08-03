@@ -39,6 +39,7 @@ const workspace = {
     createdAt: now,
     dossierId: null,
     id: essayId,
+    outline: null,
     prompt,
     revision: 0,
     schoolId: school.id,

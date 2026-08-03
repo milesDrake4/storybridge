@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import type { EssayAngleId } from "@/contracts/domain/ids";
 import { apiSuccessSchema } from "@/contracts/http/v1/envelopes";
 import {
   essayWorkspaceSchema,
@@ -10,6 +11,7 @@ import {
 } from "@/contracts/http/v1/essays";
 import { ResearchPanel } from "@/components/essay/research-panel";
 import { AnglePicker } from "@/components/essay/angle-picker";
+import { OutlineEditor } from "@/components/essay/outline-editor";
 
 type Props = { essayId: string; initialWorkspace?: EssayWorkspaceValue };
 
@@ -21,6 +23,24 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
   const updateRevision = useCallback((revision: number) => {
     setWorkspace((current) =>
       current ? { ...current, essay: { ...current.essay, revision } } : current,
+    );
+  }, []);
+
+  const updateSelectedAngle = useCallback((selectedAngleId: EssayAngleId) => {
+    setWorkspace((current) =>
+      current
+        ? {
+            ...current,
+            essay: {
+              ...current.essay,
+              selectedAngleId,
+              status:
+                current.essay.status === "STRATEGY"
+                  ? "OUTLINING"
+                  : current.essay.status,
+            },
+          }
+        : current,
     );
   }, []);
 
@@ -119,6 +139,18 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
         essayId={workspace.essay.id}
         initialEssayRevision={workspace.essay.revision}
         initialSelectedAngleId={workspace.essay.selectedAngleId}
+        onRevisionChange={updateRevision}
+        onSelectionChange={updateSelectedAngle}
+      />
+      <OutlineEditor
+        essayId={workspace.essay.id}
+        essayRevision={workspace.essay.revision}
+        initialOutline={workspace.essay.outline ?? null}
+        selectedAngleId={workspace.essay.selectedAngleId}
+        wordLimit={workspace.essay.wordLimit}
+        onEssayChange={(essay) =>
+          setWorkspace((current) => (current ? { ...current, essay } : current))
+        }
         onRevisionChange={updateRevision}
       />
       <Link className="button button-secondary" href="/essays">

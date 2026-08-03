@@ -140,6 +140,7 @@ function dependencies(overrides: Record<string, unknown> = {}) {
     delete: vi.fn(),
     get: vi.fn().mockResolvedValue({
       essay: {
+        outline: null,
         createdAt: now.toISOString(),
         dossierId,
         id: essayId,
@@ -161,6 +162,7 @@ function dependencies(overrides: Record<string, unknown> = {}) {
       },
     }),
     list: vi.fn(),
+    updateOutline: vi.fn(),
   } as EssayWorkspaceRepository;
   const outlineProposals = {
     commit: vi.fn().mockResolvedValue({ type: "CREATED", value: proposal }),

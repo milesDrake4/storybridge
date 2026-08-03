@@ -3,6 +3,7 @@ import type {
   ApplicationSeason,
   EssayWorkspace,
 } from "@/contracts/http/v1/essays";
+import type { OutlineV1 } from "@/contracts/http/v1/outlines";
 import type { ContentHmac, IdempotencyHmac } from "@/lib/security/hmac";
 
 export type EssayListPosition = {
@@ -39,4 +40,14 @@ export interface EssayWorkspaceRepository {
     limit: number;
     userId: UserId;
   }): Promise<EssayWorkspace[]>;
+  updateOutline(input: {
+    essayId: EssayId;
+    expectedRevision: number;
+    now: Date;
+    outline: OutlineV1;
+    userId: UserId;
+  }): Promise<
+    | { type: "NOT_FOUND" | "REVISION_MISMATCH" | "STATE_CONFLICT" }
+    | { type: "UPDATED"; value: EssayWorkspace["essay"] }
+  >;
 }

@@ -21,6 +21,7 @@ const essay = {
   createdAt: now.toISOString(),
   dossierId: "c3000000-0000-4000-8000-000000000001",
   id: essayId,
+  outline: null,
   prompt: "How will your experiences help you contribute to our community?",
   revision: 2,
   schoolId: "c4000000-0000-4000-8000-000000000001" as SchoolId,
@@ -77,6 +78,7 @@ describe("atomic angle selection", () => {
         },
       }),
       list: vi.fn(),
+      updateOutline: vi.fn(),
     } as EssayWorkspaceRepository;
 
     await expect(
@@ -108,6 +110,7 @@ describe("atomic angle selection", () => {
       delete: vi.fn(),
       get: vi.fn(),
       list: vi.fn(),
+      updateOutline: vi.fn(),
     } as EssayWorkspaceRepository;
 
     await expect(

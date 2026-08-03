@@ -101,6 +101,7 @@ function dependencies(overrides: Record<string, unknown> = {}) {
         createdAt: now.toISOString(),
         dossierId: null,
         id: essayId,
+        outline: null,
         prompt: "Describe a community that has shaped your perspective.",
         revision: 0,
         schoolId: school.id,
@@ -114,6 +115,7 @@ function dependencies(overrides: Record<string, unknown> = {}) {
       school,
     }),
     list: vi.fn(),
+    updateOutline: vi.fn(),
   } as EssayWorkspaceRepository;
   const dossiers = {
     commit: vi

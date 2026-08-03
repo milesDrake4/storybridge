@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(50);
+select plan(60);
 
 select has_table('public', 'essay_angles', 'essay angles table exists');
 select has_table('public', 'angle_story_facts', 'angle fact links exist');
@@ -25,6 +25,14 @@ select ok(
     'EXECUTE'
   ),
   'browser roles cannot invoke the angle commit'
+);
+select ok(
+  not has_function_privilege(
+    'authenticated',
+    'private.update_essay_outline(uuid,uuid,integer,jsonb,timestamptz)',
+    'EXECUTE'
+  ),
+  'browser roles cannot invoke outline persistence directly'
 );
 
 insert into auth.users (id, email)
@@ -372,12 +380,56 @@ select is(
 );
 select is((select count(*) from private.ai_proposals), 1::bigint, 'invalid allocation persists no proposal');
 
+select is(
+  private.update_essay_outline(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    3, (select payload -> 'outline' from outline_payload), '2026-08-03T20:09:00Z'
+  ) ->> 'decision',
+  'UPDATED', 'a current ETag persists the explicitly copied outline'
+);
+select is(
+  (select outline from public.essays),
+  (select payload -> 'outline' from outline_payload),
+  'the editable outline survives reload'
+);
+select is((select revision from public.essays), 4, 'outline persistence advances the essay revision');
+select is((select status from public.essays), 'DRAFTING', 'a valid outline unlocks drafting');
+select is(
+  private.update_essay_outline(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    3, jsonb_set((select payload -> 'outline' from outline_payload), '{sections,0,purpose}', '"Stale overwrite"'::jsonb),
+    '2026-08-03T20:09:01Z'
+  ) ->> 'decision',
+  'REVISION_MISMATCH', 'a stale outline edit is rejected'
+);
+select is(
+  (select outline #>> '{sections,0,purpose}' from public.essays),
+  'Opening purpose', 'a stale edit leaves the saved outline unchanged'
+);
+select is(
+  private.update_essay_outline(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    4, jsonb_set((select payload -> 'outline' from outline_payload), '{sections,0,storyFactIds}', '["e0300000-0000-4000-8000-000000000002"]'::jsonb),
+    '2026-08-03T20:09:02Z'
+  ) ->> 'decision',
+  'STATE_CONFLICT', 'unverified evidence cannot enter the editable outline'
+);
+select is(
+  private.update_essay_outline(
+    'e0000000-0000-4000-8000-000000000001', (select id from angle_essay),
+    4, jsonb_set((select payload -> 'outline' from outline_payload), '{sections,0,targetWords}', '1'::jsonb),
+    '2026-08-03T20:09:03Z'
+  ) ->> 'decision',
+  'STATE_CONFLICT', 'an invalid editable word allocation is rejected'
+);
+
 select private.invalidate_essay_research_dependents(
   'e0000000-0000-4000-8000-000000000001', (select id from angle_essay)
 );
 select is((select count(*) from public.essay_angles), 0::bigint, 'research invalidation deletes prior angles');
 select is((select angle_generation_count from public.essays), 0::smallint, 'research invalidation resets generation allowance');
 select is((select status from private.ai_proposals), 'EXPIRED', 'research invalidation expires pending proposals');
+select is((select outline from public.essays), null::jsonb, 'research invalidation clears the saved outline');
 
 select * from finish();
 rollback;

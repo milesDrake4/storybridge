@@ -120,6 +120,7 @@ test("compares evidence-linked angles and preserves selection on reload", async 
           createdAt: now,
           dossierId,
           id: essayId,
+          outline: null,
           prompt: "How will your experiences help you contribute?",
           revision: selectedAngleId ? 2 : 1,
           schoolId: dossier.schoolId,
