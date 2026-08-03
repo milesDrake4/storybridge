@@ -1,15 +1,34 @@
+import { resolve } from "node:path";
+
 import { expect, test } from "@playwright/test";
 
-const authStorageState = process.env.E2E_AUTH_STORAGE_STATE;
-test.use({ storageState: authStorageState ?? { cookies: [], origins: [] } });
+import { prepareLocalInvitedAdultStorageState } from "./support/local-supabase";
+
+const generatedStorageState = resolve(
+  process.cwd(),
+  "test-results/auth/story-vault.json",
+);
+const authStorageState =
+  process.env.E2E_AUTH_STORAGE_STATE ?? generatedStorageState;
+let cleanup: (() => Promise<void>) | undefined;
+
+test.use({ storageState: authStorageState });
+
+test.beforeAll(async () => {
+  if (process.env.E2E_AUTH_STORAGE_STATE) return;
+  cleanup = await prepareLocalInvitedAdultStorageState({
+    appUrl: new URL("http://127.0.0.1:3100"),
+    path: generatedStorageState,
+  });
+});
+
+test.afterAll(async () => {
+  await cleanup?.();
+});
 
 test("reviews sources and applies explicit fact privacy controls", async ({
   page,
 }) => {
-  test.skip(
-    !authStorageState,
-    "Set E2E_AUTH_STORAGE_STATE to a current invited-adult Supabase session.",
-  );
   const now = "2026-08-02T20:00:00.000Z";
   const factId = "e2000000-0000-4000-8000-000000000001";
   const profileId = "e1000000-0000-4000-8000-000000000001";

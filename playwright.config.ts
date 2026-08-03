@@ -1,6 +1,15 @@
 import { defineConfig, devices } from "@playwright/test";
 
+import { discoverLocalSupabaseEnvironment } from "./e2e/support/local-supabase";
+
 const port = 3100;
+const localSupabase = (() => {
+  try {
+    return discoverLocalSupabaseEnvironment();
+  } catch {
+    return undefined;
+  }
+})();
 const testServerEnvironment = {
   BETA_ACCOUNT_CAP: "25",
   CONTENT_HMAC_SECRET: "test-content-hmac-secret-00000000002",
@@ -12,8 +21,14 @@ const testServerEnvironment = {
   MAX_AI_OUTPUT_TOKENS: "4000",
   MONTHLY_OPENAI_BUDGET_CENTS: "15000",
   NEXT_PUBLIC_APP_URL: `http://127.0.0.1:${port}`,
-  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: "test-publishable-key",
-  NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+  NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+    process.env.E2E_SUPABASE_PUBLISHABLE_KEY ??
+    localSupabase?.publishableKey ??
+    "test-publishable-key",
+  NEXT_PUBLIC_SUPABASE_URL:
+    process.env.E2E_SUPABASE_URL ??
+    localSupabase?.supabaseUrl ??
+    "https://test.supabase.co",
   OPENAI_API_KEY: "test-openai-key",
   OPENAI_MODEL: "gpt-5.6-terra",
   PAID_ESSAY_LIMIT: "20",
@@ -21,7 +36,10 @@ const testServerEnvironment = {
   STRIPE_SEASON_PASS_PRICE_ID: "price_test",
   STRIPE_SECRET_KEY: "test-stripe-secret",
   STRIPE_WEBHOOK_SECRET: "test-stripe-webhook-secret",
-  SUPABASE_SECRET_KEY: "test-supabase-secret",
+  SUPABASE_SECRET_KEY:
+    process.env.E2E_SUPABASE_SECRET_KEY ??
+    localSupabase?.secretKey ??
+    "test-supabase-secret",
 } as const;
 
 export default defineConfig({

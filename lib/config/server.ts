@@ -27,13 +27,19 @@ const appUrlSchema = z
     return url;
   });
 
-const httpsUrlSchema = z
+const supabaseUrlSchema = z
   .string()
   .url()
   .transform((value, context) => {
     const url = new URL(value);
-    if (url.protocol !== "https:") {
-      context.addIssue({ code: "custom", message: "URL must use HTTPS" });
+    const isLoopbackHttp =
+      url.protocol === "http:" &&
+      (url.hostname === "localhost" || url.hostname === "127.0.0.1");
+    if (url.protocol !== "https:" && !isLoopbackHttp) {
+      context.addIssue({
+        code: "custom",
+        message: "URL must use HTTPS or loopback HTTP",
+      });
       return z.NEVER;
     }
     return url;
@@ -49,7 +55,7 @@ const hmacSecretSchema = z
 const rawServerConfigSchema = z
   .object({
     NEXT_PUBLIC_APP_URL: appUrlSchema,
-    NEXT_PUBLIC_SUPABASE_URL: httpsUrlSchema,
+    NEXT_PUBLIC_SUPABASE_URL: supabaseUrlSchema,
     NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(1),
     SUPABASE_SECRET_KEY: z.string().min(1),
     OPENAI_API_KEY: z.string().min(1),

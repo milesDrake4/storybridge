@@ -1,14 +1,33 @@
+import { resolve } from "node:path";
+
 import { expect, test } from "@playwright/test";
 
 import type {
   InterviewMessage,
   InterviewSessionWithMessages,
 } from "@/contracts/http/v1/interviews";
+import { prepareLocalInvitedAdultStorageState } from "./support/local-supabase";
 
-const authStorageState = process.env.E2E_AUTH_STORAGE_STATE;
+const generatedStorageState = resolve(
+  process.cwd(),
+  "test-results/auth/interview.json",
+);
+const authStorageState =
+  process.env.E2E_AUTH_STORAGE_STATE ?? generatedStorageState;
+let cleanup: (() => Promise<void>) | undefined;
 
-test.use({
-  storageState: authStorageState ?? { cookies: [], origins: [] },
+test.use({ storageState: authStorageState });
+
+test.beforeAll(async () => {
+  if (process.env.E2E_AUTH_STORAGE_STATE) return;
+  cleanup = await prepareLocalInvitedAdultStorageState({
+    appUrl: new URL("http://127.0.0.1:3100"),
+    path: generatedStorageState,
+  });
+});
+
+test.afterAll(async () => {
+  await cleanup?.();
 });
 
 const now = "2026-08-02T12:00:00.000Z";
@@ -48,10 +67,6 @@ const initial = {
 test("answers by keyboard and resumes only server-confirmed turns after reload", async ({
   page,
 }) => {
-  test.skip(
-    !authStorageState,
-    "Set E2E_AUTH_STORAGE_STATE to a current invited-adult Supabase session.",
-  );
   let current: InterviewSessionWithMessages = initial;
   await page.route("**/api/v1/interview-sessions/current", (route) =>
     route.fulfill({
