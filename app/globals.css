@@ -1315,6 +1315,40 @@ textarea:focus-visible {
   white-space: pre-wrap;
 }
 
+.coach-panel {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 2rem;
+}
+
+.coach-panel h2 {
+  margin: 0;
+}
+
+.coach-panel label {
+  display: grid;
+  font-weight: 800;
+  gap: 0.5rem;
+}
+
+.coach-panel textarea {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  color: inherit;
+  font: inherit;
+  min-height: 6rem;
+  padding: 1rem;
+  resize: vertical;
+}
+
+.coach-advice {
+  background: var(--paper-strong);
+  border-left: 3px solid var(--accent);
+  padding: 1rem 1.25rem;
+}
+
 .policy-page {
   margin: 0 auto;
   max-width: 72rem;

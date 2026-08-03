@@ -16,7 +16,9 @@ import { createSchoolResearchAdapter } from "@/adapters/openai/school-research";
 import { createAngleGenerationAdapter } from "@/adapters/openai/angle-generator";
 import { createSupabaseStoryVaultRepository } from "@/adapters/supabase/story-vault-repository";
 import { createSupabaseOutlineProposalRepository } from "@/adapters/supabase/outline-proposal-repository";
+import { createSupabaseAdviceProposalRepository } from "@/adapters/supabase/advice-proposal-repository";
 import { createOutlineGenerationAdapter } from "@/adapters/openai/outline-generator";
+import { createCoachGenerationAdapter } from "@/adapters/openai/coach";
 import { parseServerConfig } from "@/lib/config/server";
 
 export async function createEssayWorkspaceRuntime() {
@@ -34,6 +36,7 @@ export async function createEssayWorkspaceRuntime() {
     config,
     dependencies: {
       aiOperations: createSupabaseAiOperationRepository(config),
+      adviceProposals: createSupabaseAdviceProposalRepository(config),
       angles: createSupabaseEssayAngleRepository(config),
       cursorSecret: config.hmacSecrets.idempotency,
       essays: createSupabaseEssayWorkspaceRepository(config),
@@ -42,6 +45,7 @@ export async function createEssayWorkspaceRuntime() {
       hmacSecrets: config.hmacSecrets,
       profiles: createSupabaseProfileRepository(config),
       generator: createAngleGenerationAdapter(openAi.structured),
+      coachGenerator: createCoachGenerationAdapter(openAi.structured),
       research: createSchoolResearchAdapter(
         {
           contentHmacSecret: config.hmacSecrets.content,
@@ -55,6 +59,7 @@ export async function createEssayWorkspaceRuntime() {
         dailyAiCallLimit: config.dailyAiCallLimit,
         monthlyOpenAiBudgetCents: config.monthlyOpenAiBudgetCents,
       },
+      moderation: openAi.moderation,
       outlineGenerator: createOutlineGenerationAdapter(openAi.structured),
       outlineProposals: createSupabaseOutlineProposalRepository(config),
       session: createSupabaseAuthenticatedSession(
