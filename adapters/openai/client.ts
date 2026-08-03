@@ -16,13 +16,14 @@ import type {
 import type { UserId } from "@/contracts/domain/ids";
 import type { ServerConfig } from "@/lib/config/server";
 
-type OpenAiRequestOptions = {
+export type OpenAiRequestOptions = {
   maxRetries: number;
   signal: AbortSignal;
   timeout: number;
 };
 
-type OpenAiResponseRequest = {
+export type OpenAiResponseRequest = {
+  include?: ["web_search_call.action.sources"];
   input: string;
   instructions: string;
   max_output_tokens: number;
@@ -37,6 +38,12 @@ type OpenAiResponseRequest = {
       type: "json_schema";
     };
   };
+  tool_choice?: "required";
+  tools?: Array<{
+    filters: { allowed_domains: string[] };
+    search_context_size?: "low" | "medium" | "high";
+    type: "web_search";
+  }>;
 };
 
 type OpenAiModerationRequest = {
@@ -89,7 +96,10 @@ type OpenAiAdapterConfig = {
   model: string;
 };
 
-function safetyIdentifier(userId: UserId, secret: string): string {
+export function createOpenAiSafetyIdentifier(
+  userId: UserId,
+  secret: string,
+): string {
   const digest = createHmac("sha256", secret)
     .update(`storybridge:OPENAI_SAFETY:${userId}`, "utf8")
     .digest("base64url");
@@ -123,7 +133,7 @@ export function createOpenAiAdapters(
               config.maxOutputTokens,
             ),
             model: config.model,
-            safety_identifier: safetyIdentifier(
+            safety_identifier: createOpenAiSafetyIdentifier(
               request.userId,
               config.contentHmacSecret,
             ),
