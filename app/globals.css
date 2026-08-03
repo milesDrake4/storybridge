@@ -597,6 +597,82 @@ textarea:focus-visible {
   gap: 0.75rem;
 }
 
+.research-panel {
+  border-top: 2px solid var(--accent);
+  margin-top: 3rem;
+  padding-top: 1.25rem;
+}
+
+.research-panel header h2 {
+  font-size: clamp(1.6rem, 4vw, 2.5rem);
+  margin: 0.5rem 0 0;
+}
+
+.research-empty,
+.research-summary {
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 44rem;
+}
+
+.research-empty .button {
+  margin-top: 0.5rem;
+}
+
+.research-notice {
+  border-left: 3px solid #a43e32;
+  color: #762b23;
+  line-height: 1.55;
+  padding-left: 1rem;
+}
+
+.research-sources {
+  display: grid;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 2rem 0 0;
+  padding: 0;
+}
+
+.research-sources li {
+  border: 1px solid var(--line);
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.research-category {
+  color: var(--accent-strong);
+  font-family: monospace;
+  font-size: 0.72rem;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.research-sources h3 {
+  font-size: 1.15rem;
+  line-height: 1.4;
+  margin: 0.65rem 0 0;
+}
+
+.research-sources blockquote {
+  border-left: 2px solid var(--accent);
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 1rem 0;
+  padding-left: 1rem;
+}
+
+.research-provenance {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.research-sources a {
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
 @media (max-width: 30rem) {
   .dashboard-essays {
     margin-left: 0;
