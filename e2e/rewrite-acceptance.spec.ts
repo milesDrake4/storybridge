@@ -128,16 +128,20 @@ test("previews an exact rewrite and applies it only after acceptance", async ({
 
   await page.goto(`/essays/${essayId}`);
   const editor = page.getByRole("textbox", { name: "Essay draft" });
-  await editor.evaluate(
-    (element, range) => {
-      const textarea = element as HTMLTextAreaElement;
-      textarea.focus();
-      textarea.setSelectionRange(range.start, range.end);
-      textarea.dispatchEvent(new Event("select", { bubbles: true }));
-    },
-    { end: start + selectedText.length, start },
-  );
-  await page.getByRole("button", { name: "Generate preview" }).click();
+  await expect(editor).toHaveValue(draftText);
+  await editor.click();
+  await editor.press("Home");
+  for (let offset = 0; offset < start; offset += 1) {
+    await editor.press("ArrowRight");
+  }
+  await page.keyboard.down("Shift");
+  for (let offset = 0; offset < selectedText.length; offset += 1) {
+    await editor.press("ArrowRight");
+  }
+  await page.keyboard.up("Shift");
+  const generate = page.getByRole("button", { name: "Generate preview" });
+  await expect(generate).toBeEnabled();
+  await generate.click();
   await expect(
     page.getByRole("heading", { name: "Proposed rewrite" }),
   ).toBeVisible();
