@@ -13,6 +13,9 @@ export type UserId = z.infer<typeof userIdSchema>;
 export const essayIdSchema = canonicalUuidSchema.brand<"EssayId">();
 export type EssayId = z.infer<typeof essayIdSchema>;
 
+export const essayAngleIdSchema = canonicalUuidSchema.brand<"EssayAngleId">();
+export type EssayAngleId = z.infer<typeof essayAngleIdSchema>;
+
 export const schoolDossierIdSchema =
   canonicalUuidSchema.brand<"SchoolDossierId">();
 export type SchoolDossierId = z.infer<typeof schoolDossierIdSchema>;

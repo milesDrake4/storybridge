@@ -24,6 +24,7 @@ type SuccessResponseOptions = ResponseOptions & {
 
 type ErrorResponseOptions = ResponseOptions & {
   fieldErrors?: FieldError[];
+  followUpQuestion?: string;
   resetAt?: string;
 };
 
@@ -74,6 +75,9 @@ export function createErrorResponse(
       message: publicErrorMessageByCode[code],
       retryable: isRetryableError(code),
       ...(options.fieldErrors ? { fieldErrors: options.fieldErrors } : {}),
+      ...(options.followUpQuestion
+        ? { followUpQuestion: options.followUpQuestion }
+        : {}),
       ...(resetAt ? { resetAt } : {}),
     },
     meta: { requestId },
