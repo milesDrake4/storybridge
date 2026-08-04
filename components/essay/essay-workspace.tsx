@@ -14,6 +14,7 @@ import { AnglePicker } from "@/components/essay/angle-picker";
 import { OutlineEditor } from "@/components/essay/outline-editor";
 import { PlainTextEditor } from "@/components/essay/plain-text-editor";
 import { CoachPanel } from "@/components/essay/coach-panel";
+import { ReferenceDraftPanel } from "@/components/essay/reference-draft-panel";
 
 type Props = { essayId: string; initialWorkspace?: EssayWorkspaceValue };
 
@@ -170,6 +171,12 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
       ) : null}
       {workspace.essay.outline ? (
         <CoachPanel essayId={workspace.essay.id} />
+      ) : null}
+      {workspace.essay.outline ? (
+        <ReferenceDraftPanel
+          essayId={workspace.essay.id}
+          initialProposal={workspace.referenceDraft ?? null}
+        />
       ) : null}
       <Link className="button button-secondary" href="/essays">
         Back to essays

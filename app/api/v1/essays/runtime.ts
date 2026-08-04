@@ -24,6 +24,7 @@ import { createReferenceDraftGenerationAdapter } from "@/adapters/openai/referen
 import { createSupabaseRevisionProposalRepository } from "@/adapters/supabase/revision-proposal-repository";
 import { createSupabaseReferenceDraftRepository } from "@/adapters/supabase/reference-draft-repository";
 import { createSupabaseProposalAcceptanceRepository } from "@/adapters/supabase/proposal-acceptance-repository";
+import { createSupabaseClaimConfirmationRepository } from "@/adapters/supabase/claim-confirmation-repository";
 import { parseServerConfig } from "@/lib/config/server";
 
 export async function createEssayWorkspaceRuntime() {
@@ -41,6 +42,7 @@ export async function createEssayWorkspaceRuntime() {
     config,
     dependencies: {
       acceptance: createSupabaseProposalAcceptanceRepository(config),
+      claimConfirmations: createSupabaseClaimConfirmationRepository(config),
       aiOperations: createSupabaseAiOperationRepository(config),
       adviceProposals: createSupabaseAdviceProposalRepository(config),
       angles: createSupabaseEssayAngleRepository(config),

@@ -78,7 +78,15 @@ function dependencies() {
     claims: [
       {
         contentHmac: `v1.${"c".repeat(43)}`,
+        decidedAt: null,
+        decision: null,
         end: Array.from(referenceText).length,
+        evidence: {
+          schoolSources: [],
+          storyFacts: [
+            { id: factId, summary: "Repaired bicycles with neighbors." },
+          ],
+        },
         id: "dc000000-0000-4000-8000-000000000001" as ProposalClaimId,
         schoolSourceIds: [],
         start: 0,

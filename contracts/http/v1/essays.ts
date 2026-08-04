@@ -13,6 +13,7 @@ import {
 } from "@/contracts/http/v1/common";
 import { schoolSummarySchema } from "@/contracts/http/v1/schools";
 import { outlineV1Schema } from "@/contracts/http/v1/outlines";
+import { referenceDraftProposalSchema } from "@/contracts/http/v1/reference-drafts";
 
 export const applicationSeasonSchema = z.literal("2026-2027");
 export type ApplicationSeason = z.infer<typeof applicationSeasonSchema>;
@@ -92,6 +93,7 @@ export type EssaySummary = z.infer<typeof essaySummarySchema>;
 
 export const essayWorkspaceSchema = z.object({
   essay: essaySchema,
+  referenceDraft: referenceDraftProposalSchema.nullable().optional(),
   school: schoolSummarySchema,
 });
 export type EssayWorkspace = z.infer<typeof essayWorkspaceSchema>;

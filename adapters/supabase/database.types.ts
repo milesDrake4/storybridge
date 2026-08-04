@@ -628,6 +628,18 @@ export type Database = {
         };
         Returns: Json;
       };
+      decide_reference_claim: {
+        Args: {
+          requested_at?: string;
+          requested_claim_id: string;
+          requested_decision: string;
+          requested_essay_id: string;
+          requested_idempotency_key_hmac: string;
+          requested_request_hmac: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       find_proposal_acceptance_replay: {
         Args: {
           requested_idempotency_key_hmac: string;
