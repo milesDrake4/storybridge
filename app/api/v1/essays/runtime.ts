@@ -25,6 +25,11 @@ import { createSupabaseRevisionProposalRepository } from "@/adapters/supabase/re
 import { createSupabaseReferenceDraftRepository } from "@/adapters/supabase/reference-draft-repository";
 import { createSupabaseProposalAcceptanceRepository } from "@/adapters/supabase/proposal-acceptance-repository";
 import { createSupabaseClaimConfirmationRepository } from "@/adapters/supabase/claim-confirmation-repository";
+import { createSupabaseEssayAuditRepository } from "@/adapters/supabase/essay-audit-repository";
+import {
+  measureReferenceSimilarity,
+  noReferenceSimilarity,
+} from "@/domain/audit/similarity";
 import { parseServerConfig } from "@/lib/config/server";
 
 export async function createEssayWorkspaceRuntime() {
@@ -42,6 +47,7 @@ export async function createEssayWorkspaceRuntime() {
     config,
     dependencies: {
       acceptance: createSupabaseProposalAcceptanceRepository(config),
+      audits: createSupabaseEssayAuditRepository(config),
       claimConfirmations: createSupabaseClaimConfirmationRepository(config),
       aiOperations: createSupabaseAiOperationRepository(config),
       adviceProposals: createSupabaseAdviceProposalRepository(config),
@@ -80,6 +86,10 @@ export async function createEssayWorkspaceRuntime() {
         config,
         toSupabaseCookieMethods(await cookies()),
       ),
+      similarity: {
+        measure: measureReferenceSimilarity,
+        noReference: noReferenceSimilarity,
+      },
       vault: createSupabaseStoryVaultRepository(config),
     },
   };

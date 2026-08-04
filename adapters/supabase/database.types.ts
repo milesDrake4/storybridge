@@ -640,6 +640,31 @@ export type Database = {
         };
         Returns: Json;
       };
+      get_essay_audit_context: {
+        Args: { requested_essay_id: string; requested_user_id: string };
+        Returns: Json;
+      };
+      get_essay_audit: {
+        Args: { requested_audit_id: string; requested_user_id: string };
+        Returns: Json;
+      };
+      commit_essay_audit: {
+        Args: {
+          requested_at?: string;
+          requested_audit_id: string;
+          requested_essay_id: string;
+          requested_essay_revision: number;
+          requested_evidence_manifest_version: string;
+          requested_expected_draft_text: string;
+          requested_idempotency_key_hmac: string;
+          requested_issues: Json;
+          requested_request_hmac: string;
+          requested_similarity: Json;
+          requested_status: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       find_proposal_acceptance_replay: {
         Args: {
           requested_idempotency_key_hmac: string;
