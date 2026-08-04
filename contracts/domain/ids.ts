@@ -38,6 +38,9 @@ export const proposalClaimIdSchema =
   canonicalUuidSchema.brand<"ProposalClaimId">();
 export type ProposalClaimId = z.infer<typeof proposalClaimIdSchema>;
 
+export const essayAuditIdSchema = canonicalUuidSchema.brand<"EssayAuditId">();
+export type EssayAuditId = z.infer<typeof essayAuditIdSchema>;
+
 export const outlineSectionIdSchema =
   canonicalUuidSchema.brand<"OutlineSectionId">();
 export type OutlineSectionId = z.infer<typeof outlineSectionIdSchema>;
