@@ -1,7 +1,7 @@
 begin;
 
 create extension if not exists pgtap with schema extensions;
-select plan(19);
+select plan(34);
 
 select has_table('private', 'proposal_claims', 'proposal claims exist');
 select has_table(
@@ -31,6 +31,37 @@ select ok(
     'EXECUTE'
   ),
   'browser roles cannot commit reference drafts'
+);
+select has_table(
+  'private', 'essay_claim_confirmations',
+  'reference claim confirmations exist'
+);
+select ok(
+  not has_table_privilege(
+    'authenticated', 'private.essay_claim_confirmations', 'SELECT'
+  ),
+  'browser roles cannot read claim confirmations directly'
+);
+select ok(
+  not has_table_privilege(
+    'service_role', 'private.essay_claim_confirmations', 'UPDATE'
+  ) and not has_table_privilege(
+    'service_role', 'private.essay_claim_confirmations', 'DELETE'
+  ),
+  'the application service cannot mutate or delete claim confirmations'
+);
+select has_function(
+  'private', 'decide_reference_claim',
+  array['uuid','uuid','uuid','text','text','text','timestamp with time zone'],
+  'reference claim decisions are transactional'
+);
+select ok(
+  not has_function_privilege(
+    'authenticated',
+    'private.decide_reference_claim(uuid,uuid,uuid,text,text,text,timestamp with time zone)',
+    'EXECUTE'
+  ),
+  'browser roles cannot decide claims directly'
 );
 
 insert into auth.users (id, email) values
@@ -217,6 +248,89 @@ select is(
 select is(
   (select count(*) from public.essay_versions),
   0::bigint, 'reference generation never creates a student draft version'
+);
+
+create temp table rejected_claim as
+select private.decide_reference_claim(
+  'ee000000-0000-4000-8000-000000000001',
+  'ee100000-0000-4000-8000-000000000001',
+  (select id from private.proposal_claims),
+  'REJECT', 'v1.' || repeat('g', 43), 'v1.' || repeat('h', 43), now()
+) as value;
+
+select is(
+  (select value ->> 'decision' from rejected_claim),
+  'DECIDED', 'an owned supported reference claim can be decided'
+);
+select is(
+  (select value -> 'confirmation' ->> 'decision' from rejected_claim),
+  'REJECTED', 'the rejection is stored explicitly'
+);
+select is(
+  (select claim_content_hmac from private.essay_claim_confirmations),
+  (select content_hmac from private.proposal_claims),
+  'the decision binds the immutable claim content HMAC'
+);
+select is(
+  private.decide_reference_claim(
+    'ee000000-0000-4000-8000-000000000001',
+    'ee100000-0000-4000-8000-000000000001',
+    (select id from private.proposal_claims),
+    'REJECT', 'v1.' || repeat('g', 43), 'v1.' || repeat('h', 43), now()
+  ) ->> 'decision',
+  'REPLAY', 'an identical claim decision replays safely'
+);
+select is(
+  private.decide_reference_claim(
+    'ee000000-0000-4000-8000-000000000001',
+    'ee100000-0000-4000-8000-000000000001',
+    (select id from private.proposal_claims),
+    'CONFIRM', 'v1.' || repeat('g', 43), 'v1.' || repeat('i', 43), now()
+  ) ->> 'decision',
+  'IDEMPOTENCY_KEY_REUSED', 'a reused key cannot change its request'
+);
+select is(
+  private.decide_reference_claim(
+    'ee000000-0000-4000-8000-000000000001',
+    'ee100000-0000-4000-8000-000000000001',
+    (select id from private.proposal_claims),
+    'CONFIRM', 'v1.' || repeat('j', 43), 'v1.' || repeat('k', 43), now()
+  ) ->> 'decision',
+  'STATE_CONFLICT', 'a claim cannot receive a second decision'
+);
+select is(
+  private.decide_reference_claim(
+    'ee000000-0000-4000-8000-000000000001',
+    'ee100000-0000-4000-8000-000000000099',
+    (select id from private.proposal_claims),
+    'REJECT', 'v1.' || repeat('l', 43), 'v1.' || repeat('m', 43), now()
+  ) ->> 'decision',
+  'NOT_FOUND', 'an incorrect essay cannot address the claim'
+);
+select is(
+  private.decide_reference_claim(
+    'ee000000-0000-4000-8000-000000000099',
+    'ee100000-0000-4000-8000-000000000001',
+    (select id from private.proposal_claims),
+    'REJECT', 'v1.' || repeat('n', 43), 'v1.' || repeat('o', 43), now()
+  ) ->> 'decision',
+  'NOT_FOUND', 'another owner cannot address the claim'
+);
+
+update public.essays
+set draft_text = 'A wholly revised student-authored draft.', revision = revision + 1
+where id = 'ee100000-0000-4000-8000-000000000001';
+
+select is(
+  private.get_essay_workspace(
+    'ee000000-0000-4000-8000-000000000001',
+    'ee100000-0000-4000-8000-000000000001'
+  ) -> 'claim_confirmations' -> 0 ->> 'decision',
+  'REJECTED', 'a rejected claim remains visible after draft revision'
+);
+select is(
+  (select count(*) from private.essay_claim_confirmations),
+  1::bigint, 'decision attempts never duplicate the immutable confirmation'
 );
 
 select * from finish();

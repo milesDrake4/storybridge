@@ -59,6 +59,27 @@ export type ReferenceDraftDraft = z.infer<typeof referenceDraftDraftSchema>;
 
 export const referenceClaimSchema = referenceClaimDraftSchema.safeExtend({
   contentHmac: z.string().regex(/^v[1-9][0-9]*\.[A-Za-z0-9_-]{43}$/),
+  decision: z.enum(["CONFIRMED", "REJECTED"]).nullable().default(null),
+  decidedAt: rfc3339UtcSchema.nullable().default(null),
+  evidence: z.strictObject({
+    schoolSources: z
+      .array(
+        z.strictObject({
+          claim: z.string().trim().min(1).max(500),
+          id: schoolDossierSourceIdSchema,
+          title: z.string().trim().min(1).max(300),
+        }),
+      )
+      .max(10),
+    storyFacts: z
+      .array(
+        z.strictObject({
+          id: storyFactIdSchema,
+          summary: z.string().trim().min(1).max(500),
+        }),
+      )
+      .max(10),
+  }),
   id: proposalClaimIdSchema,
   status: z.literal("SUPPORTED"),
 });
@@ -82,3 +103,18 @@ export const referenceDraftProposalSchema = z.strictObject({
 export type ReferenceDraftProposal = z.infer<
   typeof referenceDraftProposalSchema
 >;
+
+export const claimDecisionInputSchema = z.strictObject({
+  decision: z.enum(["CONFIRM", "REJECT"]),
+});
+export type ClaimDecisionInput = z.infer<typeof claimDecisionInputSchema>;
+
+export const claimConfirmationSchema = z.strictObject({
+  claimContentHmac: z.string().regex(/^v[1-9][0-9]*\.[A-Za-z0-9_-]{43}$/),
+  claimId: proposalClaimIdSchema,
+  decidedAt: rfc3339UtcSchema,
+  decision: z.enum(["CONFIRMED", "REJECTED"]),
+  essayId: essayIdSchema,
+  userId: userIdSchema,
+});
+export type ClaimConfirmation = z.infer<typeof claimConfirmationSchema>;

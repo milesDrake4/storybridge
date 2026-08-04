@@ -10,12 +10,18 @@ import type { ReferenceDraftRepository } from "@/repositories/reference-draft-re
 
 const claimRowSchema = z.object({
   content_hmac: z.string(),
+  decided_at: z.string().nullable().optional(),
+  decision: z.enum(["CONFIRMED", "REJECTED"]).nullable().optional(),
   end: z.number().int(),
   id: z.string(),
   school_source_ids: z.array(z.string()),
+  school_sources: z.array(
+    z.object({ claim: z.string(), id: z.string(), title: z.string() }),
+  ),
   start: z.number().int(),
   status: z.literal("SUPPORTED"),
   story_fact_ids: z.array(z.string()),
+  story_facts: z.array(z.object({ id: z.string(), summary: z.string() })),
   text: z.string(),
 });
 const rowSchema = z.object({
@@ -44,15 +50,25 @@ const resultSchema = z.object({
   proposal: z.unknown().nullable(),
 });
 
-function mapProposal(value: unknown): ReferenceDraftProposal {
+export function mapReferenceDraftProposal(
+  value: unknown,
+): ReferenceDraftProposal {
   const row = rowSchema.parse(value);
   return referenceDraftProposalSchema.parse({
     acknowledgmentVersion: row.acknowledgment_version,
     canAccept: false,
     claims: row.claims.map((claim) => ({
       contentHmac: claim.content_hmac,
+      decidedAt: claim.decided_at
+        ? new Date(claim.decided_at).toISOString()
+        : null,
+      decision: claim.decision ?? null,
       end: claim.end,
       id: claim.id,
+      evidence: {
+        schoolSources: claim.school_sources,
+        storyFacts: claim.story_facts,
+      },
       schoolSourceIds: claim.school_source_ids,
       start: claim.start,
       status: claim.status,
@@ -105,7 +121,10 @@ export function createSupabaseReferenceDraftRepository(
         return { type: result.decision };
       }
       if (!result.proposal) throw new Error("Reference proposal is missing");
-      return { type: result.decision, value: mapProposal(result.proposal) };
+      return {
+        type: result.decision,
+        value: mapReferenceDraftProposal(result.proposal),
+      };
     },
     async findById(userId, proposalId) {
       const { data, error } = await client
@@ -115,7 +134,7 @@ export function createSupabaseReferenceDraftRepository(
           requested_user_id: userId,
         });
       if (error) throw error;
-      return data ? mapProposal(data) : null;
+      return data ? mapReferenceDraftProposal(data) : null;
     },
   };
 }

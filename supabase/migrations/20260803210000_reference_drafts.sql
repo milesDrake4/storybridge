@@ -121,9 +121,29 @@ as $$
           where link.user_id = claim.user_id
             and link.proposal_claim_id = claim.id
         ), '[]'::jsonb),
+        'story_facts', coalesce((
+          select jsonb_agg(jsonb_build_object(
+            'id', fact.id, 'summary', fact.summary
+          ) order by fact.id)
+          from private.proposal_claim_story_facts link
+          join public.story_facts fact
+            on fact.user_id = link.user_id and fact.id = link.story_fact_id
+          where link.user_id = claim.user_id
+            and link.proposal_claim_id = claim.id
+        ), '[]'::jsonb),
         'school_source_ids', coalesce((
           select jsonb_agg(link.school_source_id order by link.school_source_id)
           from private.proposal_claim_school_sources link
+          where link.user_id = claim.user_id
+            and link.proposal_claim_id = claim.id
+        ), '[]'::jsonb),
+        'school_sources', coalesce((
+          select jsonb_agg(jsonb_build_object(
+            'id', source.id, 'claim', source.claim, 'title', source.title
+          ) order by source.id)
+          from private.proposal_claim_school_sources link
+          join public.school_dossier_sources source
+            on source.user_id = link.user_id and source.id = link.school_source_id
           where link.user_id = claim.user_id
             and link.proposal_claim_id = claim.id
         ), '[]'::jsonb)

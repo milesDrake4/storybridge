@@ -8,6 +8,7 @@ import {
   type EssayWorkspace,
 } from "@/contracts/http/v1/essays";
 import { schoolSummarySchema } from "@/contracts/http/v1/schools";
+import { mapReferenceDraftProposal } from "@/adapters/supabase/reference-draft-repository";
 import type { ServerConfig } from "@/lib/config/server";
 import type {
   CreateEssayWorkspaceDecision,
@@ -30,7 +31,17 @@ const createResultSchema = z.object({
 });
 
 const workspaceResultSchema = z.object({
+  claim_confirmations: z
+    .array(
+      z.object({
+        claim_id: z.string(),
+        decided_at: z.string(),
+        decision: z.enum(["CONFIRMED", "REJECTED"]),
+      }),
+    )
+    .optional(),
   essay: z.unknown(),
+  reference_draft: z.unknown().nullable().optional(),
   school: z.unknown(),
 });
 const updateResultSchema = z.object({
@@ -83,8 +94,32 @@ function mapSchool(value: unknown) {
 
 function mapWorkspace(value: unknown): EssayWorkspace {
   const row = workspaceResultSchema.parse(value);
+  const referenceDraft = row.reference_draft
+    ? mapReferenceDraftProposal(row.reference_draft)
+    : null;
+  const decisions = new Map(
+    (row.claim_confirmations ?? []).map((confirmation) => [
+      confirmation.claim_id,
+      confirmation,
+    ]),
+  );
   return essayWorkspaceSchema.parse({
     essay: mapEssay(row.essay as EssayRow),
+    referenceDraft: referenceDraft
+      ? {
+          ...referenceDraft,
+          claims: referenceDraft.claims.map((claim) => {
+            const confirmation = decisions.get(claim.id);
+            return {
+              ...claim,
+              decidedAt: confirmation
+                ? new Date(confirmation.decided_at).toISOString()
+                : null,
+              decision: confirmation?.decision ?? null,
+            };
+          }),
+        }
+      : null,
     school: mapSchool(row.school),
   });
 }
