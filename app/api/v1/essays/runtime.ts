@@ -26,6 +26,7 @@ import { createSupabaseReferenceDraftRepository } from "@/adapters/supabase/refe
 import { createSupabaseProposalAcceptanceRepository } from "@/adapters/supabase/proposal-acceptance-repository";
 import { createSupabaseClaimConfirmationRepository } from "@/adapters/supabase/claim-confirmation-repository";
 import { createSupabaseEssayAuditRepository } from "@/adapters/supabase/essay-audit-repository";
+import { createSupabaseDraftExportRepository } from "@/adapters/supabase/draft-export-repository";
 import {
   measureReferenceSimilarity,
   noReferenceSimilarity,
@@ -54,6 +55,7 @@ export async function createEssayWorkspaceRuntime() {
       angles: createSupabaseEssayAngleRepository(config),
       cursorSecret: config.hmacSecrets.idempotency,
       essays: createSupabaseEssayWorkspaceRepository(config),
+      exports: createSupabaseDraftExportRepository(config),
       versions: createSupabaseEssayVersionRepository(config),
       dossiers: createSupabaseSchoolDossierRepository(config),
       hmacSecrets: config.hmacSecrets,

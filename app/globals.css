@@ -1490,6 +1490,58 @@ textarea:focus-visible {
   color: #7d2f27;
 }
 
+.final-review {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+.final-review h2,
+.final-review p {
+  margin: 0;
+}
+
+.final-review-result {
+  border-left: 4px solid #9b3b31;
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.final-review-result.PASS {
+  border-left-color: var(--accent-strong);
+}
+
+.final-review-result > p[role="status"] {
+  font-weight: 800;
+}
+
+.final-review-issues {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding-left: 1.5rem;
+}
+
+.final-review-issues li {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.final-review-issues a {
+  color: var(--accent-strong);
+  font-weight: 800;
+}
+
+.final-review-policy {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  line-height: 1.6;
+  padding-top: 1rem;
+}
+
 .policy-page {
   margin: 0 auto;
   max-width: 72rem;

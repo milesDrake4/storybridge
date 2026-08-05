@@ -15,6 +15,7 @@ import { OutlineEditor } from "@/components/essay/outline-editor";
 import { PlainTextEditor } from "@/components/essay/plain-text-editor";
 import { CoachPanel } from "@/components/essay/coach-panel";
 import { ReferenceDraftPanel } from "@/components/essay/reference-draft-panel";
+import { FinalReview } from "@/components/essay/final-review";
 
 type Props = { essayId: string; initialWorkspace?: EssayWorkspaceValue };
 
@@ -176,6 +177,12 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
         <ReferenceDraftPanel
           essayId={workspace.essay.id}
           initialProposal={workspace.referenceDraft ?? null}
+        />
+      ) : null}
+      {workspace.essay.outline ? (
+        <FinalReview
+          essayId={workspace.essay.id}
+          essayRevision={workspace.essay.revision}
         />
       ) : null}
       <Link className="button button-secondary" href="/essays">
