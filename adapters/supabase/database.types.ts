@@ -648,6 +648,10 @@ export type Database = {
         Args: { requested_audit_id: string; requested_user_id: string };
         Returns: Json;
       };
+      get_student_draft_export: {
+        Args: { requested_essay_id: string; requested_user_id: string };
+        Returns: Json;
+      };
       commit_essay_audit: {
         Args: {
           requested_at?: string;
