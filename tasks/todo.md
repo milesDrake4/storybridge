@@ -62,7 +62,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 - [x] 31. Present reference claims and record immutable decisions
 - [x] 32. Persist current-revision audits and deterministic similarity
 - [x] 33. Deliver final review and student-draft-only export
-- [ ] Checkpoint 6: Integrity-safe completion green
+- [x] Checkpoint 6: Integrity-safe completion green
 
 ## Slice 7: Billing and privacy
 
