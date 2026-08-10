@@ -1,0 +1,37 @@
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Documented placeholder HMAC values in the environment template"
+condition = "AND"
+regexTarget = "match"
+paths = ['''^\.env\.example$''']
+regexes = ['''^(?:INTERNAL_OPERATIONS_SECRET|IDEMPOTENCY_HMAC_SECRET)=replace-with-''']
+
+[[allowlists]]
+description = "Synthetic operations secret used by safe-logging coverage"
+condition = "AND"
+regexTarget = "match"
+paths = ['''^tests/integration/observability/safe-logging\.test\.ts$''']
+regexes = ['''secret:\s*["']''']
+
+[[allowlists]]
+description = "Synthetic account-deletion HMAC fixture"
+condition = "AND"
+regexTarget = "match"
+paths = ['''^tests/integration/privacy/account-lifecycle\.test\.ts$''']
+regexes = ['''idempotencyKeyHmac:\s*["']''']
+
+[[allowlists]]
+description = "Synthetic idempotency key used by Story Vault integration coverage"
+condition = "AND"
+regexTarget = "match"
+paths = ['''^tests/integration/story-vault/fact-lifecycle\.test\.ts$''']
+regexes = ['''idempotency-key''']
+
+[[allowlists]]
+description = "Synthetic configuration HMAC fixture"
+condition = "AND"
+regexTarget = "match"
+paths = ['''^tests/unit/security/config-and-boundaries\.test\.ts$''']
+regexes = ['''IDEMPOTENCY_HMAC_SECRET:\s*["']''']
