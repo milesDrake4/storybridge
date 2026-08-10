@@ -40,7 +40,7 @@
     "axe-core": "4.12.1",
     "eslint": "9.39.1",
     "eslint-config-next": "16.2.11",
-    "jsdom": "29.1.1",
+    "jsdom": "30.0.1",
     "prettier": "3.6.2",
     "supabase": "2.111.0",
     "tailwindcss": "4.1.14",
