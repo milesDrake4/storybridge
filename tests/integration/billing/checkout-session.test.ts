@@ -239,6 +239,7 @@ describe("Stripe checkout adapter", () => {
     ];
     expect(key).toBe(`storybridge-checkout:${bindingId}`);
     expect(Object.fromEntries(body)).toMatchObject({
+      "payment_method_types[0]": "card",
       "line_items[0][price]": "price_season_pass",
       "line_items[0][quantity]": "1",
       "metadata[storybridge_binding_id]": bindingId,

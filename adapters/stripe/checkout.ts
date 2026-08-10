@@ -66,6 +66,7 @@ export function createStripeCheckoutAdapter(
     async createSession(input) {
       const body = new URLSearchParams();
       body.set("mode", input.mode);
+      body.set("payment_method_types[0]", "card");
       body.set("success_url", input.successUrl);
       body.set("cancel_url", input.cancelUrl);
       body.set(
