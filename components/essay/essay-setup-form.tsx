@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 import { SchoolPicker } from "@/components/essay/school-picker";
@@ -29,6 +30,7 @@ async function json(response: Response) {
 }
 
 export function EssaySetupForm({ initialSchools, onCreated }: Props) {
+  const router = useRouter();
   const [school, setSchool] = useState<SchoolSummary | null>(null);
   const [prompt, setPrompt] = useState("");
   const [wordLimit, setWordLimit] = useState("650");
@@ -131,7 +133,7 @@ export function EssaySetupForm({ initialSchools, onCreated }: Props) {
       if (!parsed.success) throw new Error();
       pending.current = null;
       if (onCreated) onCreated(parsed.data.data.essay.id);
-      else window.location.assign(`/essays/${parsed.data.data.essay.id}`);
+      else router.push(`/essays/${parsed.data.data.essay.id}`);
     } catch {
       setError({
         message:

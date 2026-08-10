@@ -8,6 +8,9 @@ import { SchoolPicker } from "@/components/essay/school-picker";
 import type { EssaySummary } from "@/contracts/http/v1/essays";
 import type { SchoolSummary } from "@/contracts/http/v1/schools";
 
+const { push } = vi.hoisted(() => ({ push: vi.fn() }));
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+
 const now = "2026-08-03T16:00:00.000Z";
 const school = {
   canonicalName: "University of Michigan",
@@ -22,8 +25,30 @@ const essay = {
   updatedAt: now,
   wordLimit: 300,
 } as EssaySummary;
+const workspace = {
+  essay: {
+    createdAt: now,
+    dossierId: null,
+    draftText: "",
+    id: essay.id,
+    outline: null,
+    prompt: "Describe a community that has shaped your perspective.",
+    revision: 0,
+    schoolId: school.id,
+    selectedAngleId: null,
+    season: "2026-2027",
+    status: "STRATEGY",
+    updatedAt: now,
+    userId: "f0000000-0000-4000-8000-000000000001",
+    wordLimit: 300,
+  },
+  school,
+};
 
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  push.mockReset();
+  vi.unstubAllGlobals();
+});
 
 function success(data: unknown, status = 200) {
   return new Response(
@@ -77,25 +102,6 @@ describe("essay dashboard", () => {
 
 describe("essay setup", () => {
   it("selects a registry school by keyboard and submits no caller-controlled domain", async () => {
-    const workspace = {
-      essay: {
-        createdAt: now,
-        dossierId: null,
-        draftText: "",
-        id: essay.id,
-        outline: null,
-        prompt: "Describe a community that has shaped your perspective.",
-        revision: 0,
-        schoolId: school.id,
-        selectedAngleId: null,
-        season: "2026-2027",
-        status: "STRATEGY",
-        updatedAt: now,
-        userId: "f0000000-0000-4000-8000-000000000001",
-        wordLimit: 300,
-      },
-      school,
-    };
     const fetchMock = vi.fn().mockResolvedValue(success(workspace, 201));
     vi.stubGlobal("fetch", fetchMock);
     const onCreated = vi.fn();
@@ -129,6 +135,25 @@ describe("essay setup", () => {
       }),
     );
     expect(fetchMock.mock.calls[0]?.[1]?.body).not.toContain("umich.edu");
+  });
+
+  it("navigates to the created essay through the app router", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(success(workspace, 201)));
+    const user = userEvent.setup();
+    render(<EssaySetupForm initialSchools={[school]} />);
+
+    await user.click(
+      screen.getByRole("button", { name: /University of Michigan/i }),
+    );
+    await user.type(
+      screen.getByLabelText("Official application prompt"),
+      workspace.essay.prompt,
+    );
+    await user.clear(screen.getByLabelText("Word limit"));
+    await user.type(screen.getByLabelText("Word limit"), "300");
+    await user.click(screen.getByRole("button", { name: "Create workspace" }));
+
+    expect(push).toHaveBeenCalledWith(`/essays/${essay.id}`);
   });
 
   it("blocks personal prose locally and preserves every safe form choice", async () => {
