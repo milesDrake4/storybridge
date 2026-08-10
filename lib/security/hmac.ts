@@ -13,6 +13,9 @@ export type EmailHmac = PurposeHmac<"EMAIL">;
 export type InvitationTokenHmac = PurposeHmac<"INVITATION_TOKEN">;
 export type ContentHmac = PurposeHmac<"CONTENT">;
 export type IdempotencyHmac = PurposeHmac<"IDEMPOTENCY">;
+export type AccountDeletionUserHmac = PurposeHmac<"ACCOUNT_DELETION_USER">;
+export type AccountDeletionStatusTokenHmac =
+  PurposeHmac<"ACCOUNT_DELETION_STATUS_TOKEN">;
 
 function createPurposeHmac<Purpose extends string>(
   purpose: Purpose,
@@ -23,6 +26,37 @@ function createPurposeHmac<Purpose extends string>(
     .update(`storybridge:${purpose}:${value}`, "utf8")
     .digest("base64url");
   return `${ACTIVE_HMAC_KEY_VERSION}.${digest}` as PurposeHmac<Purpose>;
+}
+
+export function createAccountDeletionUserHmac(
+  userId: string,
+  secrets: HmacSecrets,
+): AccountDeletionUserHmac {
+  return createPurposeHmac("ACCOUNT_DELETION_USER", userId, secrets.content);
+}
+
+export function createAccountDeletionStatusToken(
+  userId: string,
+  idempotencyKey: string,
+  secrets: HmacSecrets,
+): string {
+  const seed = createPurposeHmac(
+    "ACCOUNT_DELETION_STATUS_TOKEN_SEED",
+    `${userId}:${idempotencyKey}`,
+    secrets.idempotency,
+  );
+  return `dst_v1_${seed.slice(3)}`;
+}
+
+export function createAccountDeletionStatusTokenHmac(
+  statusToken: string,
+  secrets: HmacSecrets,
+): AccountDeletionStatusTokenHmac {
+  return createPurposeHmac(
+    "ACCOUNT_DELETION_STATUS_TOKEN",
+    statusToken,
+    secrets.content,
+  );
 }
 
 export function createIpHmac(

@@ -60,3 +60,12 @@ export const accountDeletionStatusResponseSchema = z.strictObject({
 export type AccountDeletionStatusResponse = z.infer<
   typeof accountDeletionStatusResponseSchema
 >;
+
+const exportRecordSchema = z.record(z.string(), z.unknown());
+export const accountExportSchema = z.strictObject({
+  data: z.record(z.string(), z.array(exportRecordSchema)),
+  exportedAt: rfc3339UtcSchema,
+  profile: exportRecordSchema.nullable(),
+  schemaVersion: z.literal("2026-08-10"),
+});
+export type AccountExport = z.infer<typeof accountExportSchema>;

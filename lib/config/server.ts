@@ -78,13 +78,15 @@ const rawServerConfigSchema = z
     IP_HMAC_SECRET: hmacSecretSchema,
     CONTENT_HMAC_SECRET: hmacSecretSchema,
     IDEMPOTENCY_HMAC_SECRET: hmacSecretSchema,
+    ACCOUNT_DELETION_WORKER_SECRET: hmacSecretSchema.optional(),
   })
   .superRefine((config, context) => {
     const secrets = [
       config.IP_HMAC_SECRET,
       config.CONTENT_HMAC_SECRET,
       config.IDEMPOTENCY_HMAC_SECRET,
-    ];
+      config.ACCOUNT_DELETION_WORKER_SECRET,
+    ].filter((value): value is string => value !== undefined);
     if (new Set(secrets).size !== secrets.length) {
       context.addIssue({
         code: "custom",
@@ -106,6 +108,7 @@ export function parseServerConfig(environment: Record<string, unknown>) {
   const config = rawServerConfigSchema.parse(environment);
 
   return {
+    accountDeletionWorkerSecret: config.ACCOUNT_DELETION_WORKER_SECRET,
     appUrl: config.NEXT_PUBLIC_APP_URL,
     betaAccountCap: config.BETA_ACCOUNT_CAP,
     dailyAiCallLimit: config.DAILY_AI_CALL_LIMIT,

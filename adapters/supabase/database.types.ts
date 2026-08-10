@@ -11,11 +11,14 @@ export type Database = {
     Tables: {
       account_deletions: {
         Row: {
+          attempt_count: number;
           completed_at: string | null;
           created_at: string;
+          deletion_idempotency_key_hmac: string | null;
           deletion_status_token_hmac: string;
           expires_at: string;
           id: string;
+          processing_started_at: string | null;
           requested_at: string;
           safe_failure_code: string | null;
           status: string;
@@ -24,11 +27,14 @@ export type Database = {
           user_id_hmac: string;
         };
         Insert: {
+          attempt_count?: number;
           completed_at?: string | null;
           created_at?: string;
+          deletion_idempotency_key_hmac?: string | null;
           deletion_status_token_hmac: string;
           expires_at: string;
           id?: string;
+          processing_started_at?: string | null;
           requested_at?: string;
           safe_failure_code?: string | null;
           status?: string;
@@ -37,11 +43,14 @@ export type Database = {
           user_id_hmac: string;
         };
         Update: {
+          attempt_count?: number;
           completed_at?: string | null;
           created_at?: string;
+          deletion_idempotency_key_hmac?: string | null;
           deletion_status_token_hmac?: string;
           expires_at?: string;
           id?: string;
+          processing_started_at?: string | null;
           requested_at?: string;
           safe_failure_code?: string | null;
           status?: string;
@@ -523,6 +532,54 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      claim_next_account_deletion: {
+        Args: { requested_claimed_at?: string };
+        Returns: Json;
+      };
+      complete_account_deletion: {
+        Args: {
+          requested_completed_at?: string;
+          requested_deletion_id: string;
+        };
+        Returns: boolean;
+      };
+      fail_account_deletion: {
+        Args: {
+          requested_deletion_id: string;
+          requested_failed_at?: string;
+          requested_safe_failure_code: string;
+        };
+        Returns: boolean;
+      };
+      get_account_deletion_status: {
+        Args: {
+          requested_status_at?: string;
+          requested_status_token_hmac: string;
+        };
+        Returns: Json;
+      };
+      get_account_export: {
+        Args: {
+          requested_at?: string;
+          requested_max_bytes?: number;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
+      prepare_account_deletion: {
+        Args: { requested_deletion_id: string };
+        Returns: boolean;
+      };
+      queue_account_deletion: {
+        Args: {
+          requested_at?: string;
+          requested_idempotency_key_hmac: string;
+          requested_status_token_hmac: string;
+          requested_user_id: string;
+          requested_user_id_hmac: string;
+        };
+        Returns: Json;
+      };
       commit_stripe_event: {
         Args: {
           requested_action: string;
