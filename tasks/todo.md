@@ -69,8 +69,8 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 - [x] 34. Create idempotent Stripe Checkout sessions
 - [x] 35. Fulfill and reverse entitlements from verified webhooks
 - [x] 36. Apply paid allowance without bypassing atomic limits
-- [ ] 37. Deliver account data export and deletion
-- [ ] Checkpoint 7: Commerce and privacy green
+- [x] 37. Deliver account data export and deletion
+- [x] Checkpoint 7: Commerce and privacy green
 
 ## Slice 8: Production launch
 

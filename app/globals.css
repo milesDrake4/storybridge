@@ -1668,29 +1668,359 @@ textarea:focus-visible {
   padding-top: 1rem;
 }
 
+.public-shell {
+  min-height: 100svh;
+}
+
+.public-header,
+.public-footer {
+  margin: 0 auto;
+  max-width: 76rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.public-header {
+  align-items: center;
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  min-height: 4.75rem;
+}
+
+.public-header nav,
+.public-footer nav {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+}
+
+.public-header nav a,
+.public-footer nav a {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 0.55rem 0;
+}
+
+.public-header nav a:hover,
+.public-footer nav a:hover,
+.public-integrity a:hover {
+  color: var(--accent-strong);
+}
+
+.public-footer {
+  align-items: start;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  margin-top: 5rem;
+  padding-bottom: 3rem;
+  padding-top: 2rem;
+}
+
+.public-footer p {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.public-footer nav {
+  justify-content: end;
+}
+
+.public-hero,
+.public-section,
+.public-page,
 .policy-page {
   margin: 0 auto;
-  max-width: 72rem;
-  min-height: 100svh;
-  padding: 1.5rem 1.25rem 5rem;
+  max-width: 76rem;
+  padding-left: 1.25rem;
+  padding-right: 1.25rem;
+}
+
+.public-hero {
+  align-items: end;
+  display: grid;
+  gap: clamp(3rem, 9vw, 7rem);
+  grid-template-columns: minmax(0, 1.4fr) minmax(16rem, 0.6fr);
+  padding-bottom: clamp(5rem, 10vw, 8rem);
+  padding-top: clamp(4rem, 10vw, 8rem);
+}
+
+.public-hero h1,
+.public-page-heading h1 {
+  font-size: clamp(3rem, 8vw, 6.75rem);
+  font-weight: 600;
+  letter-spacing: -0.055em;
+  line-height: 0.94;
+  margin: 1rem 0 0;
+  max-width: 58rem;
+  text-wrap: balance;
+}
+
+.public-lede,
+.public-page-heading > p:not(.eyebrow) {
+  color: var(--muted);
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  line-height: 1.65;
+  margin: 1.75rem 0 0;
+  max-width: 44rem;
+}
+
+.public-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.beta-boundary {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  margin: 1.5rem 0 0;
+  max-width: 43rem;
+  padding-top: 1rem;
+}
+
+.public-hero aside {
+  border-left: 2px solid var(--accent);
+  padding-left: 1.5rem;
+}
+
+.public-hero aside > p:last-child {
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  line-height: 1.55;
+  margin-bottom: 0;
+}
+
+.public-band {
+  background: var(--paper-strong);
+  border-bottom: 1px solid var(--line);
+  border-top: 1px solid var(--line);
+}
+
+.public-section {
+  padding-bottom: clamp(4rem, 8vw, 7rem);
+  padding-top: clamp(4rem, 8vw, 7rem);
+}
+
+.public-section-heading {
+  max-width: 45rem;
+}
+
+.public-section-heading h2,
+.public-integrity h2 {
+  font-size: clamp(2rem, 5vw, 4rem);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  margin: 1rem 0;
+  text-wrap: balance;
+}
+
+.public-section-heading > p:last-child,
+.public-integrity > div:last-child p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.public-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  list-style: none;
+  margin: 3.5rem 0 0;
+  padding: 0;
+}
+
+.public-steps li {
+  border-top: 1px solid var(--line);
+  padding: 1.5rem 2rem 0;
+}
+
+.public-steps li:first-child {
+  padding-left: 0;
+}
+
+.public-steps li + li {
+  border-left: 1px solid var(--line);
+}
+
+.public-steps span {
+  color: var(--accent-strong);
+  font-family: monospace;
+  font-size: 0.75rem;
+}
+
+.public-steps h3 {
+  font-size: 1.25rem;
+  margin: 2rem 0 0;
+}
+
+.public-steps p {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.public-integrity {
+  display: grid;
+  gap: clamp(2rem, 7vw, 6rem);
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.7fr);
+}
+
+.public-integrity a,
+.policy-page article a {
+  color: var(--accent-strong);
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+}
+
+.public-page {
+  padding-bottom: 2rem;
+  padding-top: clamp(4rem, 10vw, 8rem);
+}
+
+.public-page-heading {
+  max-width: 58rem;
+}
+
+.pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: clamp(3rem, 7vw, 5rem);
+}
+
+.pricing-grid article {
+  border: 1px solid var(--line);
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+}
+
+.pricing-grid article + article {
+  border-left: 0;
+}
+
+.pricing-featured {
+  border-top: 3px solid var(--accent-strong) !important;
+}
+
+.pricing-price {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  margin: 1.25rem 0 0;
+}
+
+.pricing-grid h2 {
+  font-size: 1.35rem;
+  margin: 0.5rem 0 1.5rem;
+}
+
+.pricing-grid ul,
+.policy-page ul {
+  display: grid;
+  gap: 0.75rem;
+  line-height: 1.65;
+  padding-left: 1.25rem;
+}
+
+.pricing-note,
+.public-disclaimer {
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.pricing-featured .button {
+  margin-top: 1.25rem;
+}
+
+.public-disclaimer {
+  border-top: 1px solid var(--line);
+  margin: 2rem 0 0;
+  max-width: 52rem;
+  padding-top: 1rem;
+}
+
+.policy-page {
+  min-height: 60svh;
+  padding-bottom: 2rem;
 }
 
 .policy-page article {
   border-top: 2px solid var(--accent);
   margin-top: clamp(4rem, 12vh, 8rem);
-  max-width: 45rem;
+  max-width: 48rem;
   padding-top: 1.5rem;
 }
 
-.policy-page article > p:not(.eyebrow) {
+.policy-page article > p:not(.eyebrow),
+.policy-page article li {
   color: var(--muted);
-  font-size: 1.075rem;
+  font-size: 1.025rem;
   line-height: 1.75;
+}
+
+.policy-page article h2 {
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  letter-spacing: -0.02em;
+  margin: 3rem 0 0.75rem;
+}
+
+.policy-page article code {
+  background: var(--paper-strong);
+  color: var(--ink);
+  font-size: 0.9em;
+  padding: 0.1rem 0.25rem;
+}
+
+.policy-page article > .button {
+  color: var(--paper);
+  margin-top: 1rem;
+  text-decoration: none;
+}
+
+@media (max-width: 48rem) {
+  .public-header {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding-bottom: 1rem;
+    padding-top: 1rem;
+  }
+
+  .public-hero,
+  .public-integrity,
+  .pricing-grid,
+  .public-footer {
+    grid-template-columns: 1fr;
+  }
+
+  .public-steps {
+    grid-template-columns: 1fr;
+  }
+
+  .public-steps li,
+  .public-steps li:first-child {
+    border-left: 0;
+    padding: 1.5rem 0;
+  }
+
+  .pricing-grid article + article {
+    border-left: 1px solid var(--line);
+    border-top: 0;
+  }
+
+  .public-footer nav {
+    justify-content: start;
+  }
 }
 
 @media (min-width: 48rem) {
   .auth-page,
-  .policy-page,
   .product-shell {
     padding-left: 2rem;
     padding-right: 2rem;
