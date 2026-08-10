@@ -75,9 +75,9 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 ## Slice 8: Production launch
 
 - [x] 38. Add content-free analytics and operational visibility
-- [ ] 39. Publish accurate marketing, policy, and support surfaces
-- [ ] 40. Complete responsive accessibility audit
-- [ ] 41. Automate CI and preview deployment gates
+- [x] 39. Publish accurate marketing, policy, and support surfaces
+- [x] 40. Complete responsive accessibility audit
+- [x] 41. Automate CI and preview deployment gates
 - [ ] 42. Execute the production release gate
 - [ ] Checkpoint 8: Closed beta ready
 
