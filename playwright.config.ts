@@ -16,6 +16,7 @@ const testServerEnvironment = {
   DAILY_AI_CALL_LIMIT: "50",
   FREE_ESSAY_LIMIT: "1",
   IDEMPOTENCY_HMAC_SECRET: "test-idempotency-hmac-secret-000003",
+  INTERNAL_OPERATIONS_SECRET: "test-operations-secret-00000000000004",
   IP_HMAC_SECRET: "test-ip-hmac-secret-000000000000001",
   MAX_AI_INPUT_TOKENS: "12000",
   MAX_AI_OUTPUT_TOKENS: "4000",
@@ -31,6 +32,7 @@ const testServerEnvironment = {
     "https://test.supabase.co",
   OPENAI_API_KEY: "test-openai-key",
   OPENAI_MODEL: "gpt-5.6-terra",
+  AI_PROVIDER_MODE: "mock",
   PAID_ESSAY_LIMIT: "20",
   SEASON_PASS_PRICE_CENTS: "2499",
   STRIPE_SEASON_PASS_PRICE_ID: "price_test",
@@ -40,6 +42,7 @@ const testServerEnvironment = {
     process.env.E2E_SUPABASE_SECRET_KEY ??
     localSupabase?.secretKey ??
     "test-supabase-secret",
+  VERCEL_ENV: "preview",
 } as const;
 
 export default defineConfig({
@@ -49,7 +52,9 @@ export default defineConfig({
   workers: 1,
   use: {
     baseURL: `http://127.0.0.1:${port}`,
-    trace: "retain-on-failure",
+    screenshot: "off",
+    trace: process.env.CI ? "off" : "retain-on-failure",
+    video: "off",
   },
   webServer: {
     command: `npm run build && npm run start -- --hostname 127.0.0.1 --port ${port}`,

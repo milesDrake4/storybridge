@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
 import { register } from "@/instrumentation";
+import { createConfiguredOpenAiTransport } from "@/adapters/openai/client";
 import { parseServerConfig } from "@/lib/config/server";
 import {
   createContentHmac,
@@ -23,6 +24,7 @@ const validEnvironment = {
   SUPABASE_SECRET_KEY: "example-server-secret",
   OPENAI_API_KEY: "example-openai-key",
   OPENAI_MODEL: "gpt-5.6-terra",
+  AI_PROVIDER_MODE: "live",
   STRIPE_SECRET_KEY: "example-stripe-secret",
   STRIPE_WEBHOOK_SECRET: "example-webhook-secret",
   STRIPE_SEASON_PASS_PRICE_ID: "price_example",
@@ -102,6 +104,42 @@ describe("server configuration", () => {
         NODE_ENV: "production",
       }).internalOperationsSecret,
     ).toBe("operations-secret-abcdefghijklmnopqrstuvwxyz");
+  });
+
+  it("keeps preview AI mocked and requires live AI in production", () => {
+    expect(
+      parseServerConfig({
+        ...validEnvironment,
+        AI_PROVIDER_MODE: "mock",
+        INTERNAL_OPERATIONS_SECRET:
+          "operations-secret-abcdefghijklmnopqrstuvwxyz",
+        NODE_ENV: "production",
+        VERCEL_ENV: "preview",
+      }).aiProviderMode,
+    ).toBe("mock");
+    expect(() =>
+      parseServerConfig({
+        ...validEnvironment,
+        AI_PROVIDER_MODE: "mock",
+        INTERNAL_OPERATIONS_SECRET:
+          "operations-secret-abcdefghijklmnopqrstuvwxyz",
+        NODE_ENV: "production",
+      }),
+    ).toThrow("AI_PROVIDER_MODE");
+  });
+
+  it("prevents outbound provider calls when AI is mocked", async () => {
+    const config = parseServerConfig({
+      ...validEnvironment,
+      AI_PROVIDER_MODE: "mock",
+    });
+
+    await expect(
+      createConfiguredOpenAiTransport(config).createResponse(
+        {} as never,
+        {} as never,
+      ),
+    ).rejects.toMatchObject({ code: "SERVICE_UNAVAILABLE" });
   });
 
   it.each([

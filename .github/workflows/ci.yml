@@ -1,0 +1,97 @@
+name: Required CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  CI: "true"
+  SUPABASE_TELEMETRY_DISABLED: "1"
+
+jobs:
+  quality:
+    name: Quality, tests, and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: 24
+      - run: npm ci
+      - name: Validate safe preview contract
+        run: node scripts/validate-deployment-environment.mjs
+        env:
+          AI_PROVIDER_MODE: mock
+          DEPLOYMENT_VALIDATION_TARGET: preview
+          NEXT_PUBLIC_SUPABASE_URL: https://previewabcdefghijkl.supabase.co
+          OPENAI_API_KEY: mock-disabled
+          PREVIEW_SUPABASE_PROJECT_REF: previewabcdefghijkl
+          PRODUCTION_SUPABASE_PROJECT_REF: productionabcdefghijk
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+          VERCEL_ENV: preview
+      - run: npm run format:check
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run test:coverage
+      - run: npm run build
+        env:
+          AI_PROVIDER_MODE: mock
+          BETA_ACCOUNT_CAP: "25"
+          CONTENT_HMAC_SECRET: ci-content-hmac-secret-000000000002
+          DAILY_AI_CALL_LIMIT: "50"
+          FREE_ESSAY_LIMIT: "1"
+          IDEMPOTENCY_HMAC_SECRET: ci-idempotency-hmac-secret-0000003
+          INTERNAL_OPERATIONS_SECRET: ci-operations-secret-00000000000004
+          IP_HMAC_SECRET: ci-ip-hmac-secret-00000000000000001
+          MAX_AI_INPUT_TOKENS: "12000"
+          MAX_AI_OUTPUT_TOKENS: "4000"
+          MONTHLY_OPENAI_BUDGET_CENTS: "15000"
+          NEXT_PUBLIC_APP_URL: http://127.0.0.1:3100
+          NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ci-local-publishable
+          NEXT_PUBLIC_SUPABASE_URL: http://127.0.0.1:54321
+          OPENAI_API_KEY: mock-disabled
+          OPENAI_MODEL: gpt-5.6-terra
+          PAID_ESSAY_LIMIT: "20"
+          SEASON_PASS_PRICE_CENTS: "2499"
+          STRIPE_SEASON_PASS_PRICE_ID: price_ci_test
+          STRIPE_SECRET_KEY: sk_test_ci_placeholder
+          STRIPE_WEBHOOK_SECRET: whsec_ci_placeholder
+          SUPABASE_SECRET_KEY: ci-local-secret
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+  database-and-e2e:
+    name: Clean database and Chromium E2E
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          cache: npm
+          node-version: 24
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - name: Start isolated local Supabase
+        run: npx supabase start
+      - name: Rebuild migrations from a clean database
+        run: npx supabase db reset
+      - name: Run database policy and concurrency tests
+        run: npx supabase test db
+      - name: Run Chromium end-to-end suite without retained content artifacts
+        run: npm run test:e2e -- --project=chromium
+      - name: Stop isolated local Supabase
+        if: always()
+        run: npx supabase stop --no-backup || true

@@ -9,8 +9,8 @@ import { createSupabaseAiOperationRepository } from "@/adapters/supabase/ai-oper
 import { createSupabaseEssayAngleRepository } from "@/adapters/supabase/essay-angle-repository";
 import { createSupabaseSchoolDossierRepository } from "@/adapters/supabase/school-dossier-repository";
 import {
+  createConfiguredOpenAiTransport,
   createOpenAiAdapters,
-  createSdkOpenAiTransport,
 } from "@/adapters/openai/client";
 import { createSchoolResearchAdapter } from "@/adapters/openai/school-research";
 import { createAngleGenerationAdapter } from "@/adapters/openai/angle-generator";
@@ -35,7 +35,7 @@ import { parseServerConfig } from "@/lib/config/server";
 
 export async function createEssayWorkspaceRuntime() {
   const config = parseServerConfig(process.env);
-  const transport = createSdkOpenAiTransport(config.openAiApiKey);
+  const transport = createConfiguredOpenAiTransport(config);
   const openAi = createOpenAiAdapters(
     {
       contentHmacSecret: config.hmacSecrets.content,

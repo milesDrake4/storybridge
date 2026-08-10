@@ -64,6 +64,7 @@ const rawServerConfigSchema = z
     SUPABASE_SECRET_KEY: z.string().min(1),
     OPENAI_API_KEY: z.string().min(1),
     OPENAI_MODEL: z.string().trim().min(1),
+    AI_PROVIDER_MODE: z.enum(["live", "mock"]).default("mock"),
     STRIPE_SECRET_KEY: z.string().min(1),
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
     STRIPE_SEASON_PASS_PRICE_ID: z.string().startsWith("price_").min(7),
@@ -112,9 +113,17 @@ export function parseServerConfig(environment: Record<string, unknown>) {
   if (productionRuntime && !config.INTERNAL_OPERATIONS_SECRET) {
     throw new Error("INTERNAL_OPERATIONS_SECRET is required in production");
   }
+  const productionDeployment =
+    productionRuntime &&
+    (environment.VERCEL_ENV === undefined ||
+      environment.VERCEL_ENV === "production");
+  if (productionDeployment && config.AI_PROVIDER_MODE !== "live") {
+    throw new Error("AI_PROVIDER_MODE must be live in production");
+  }
 
   return {
     internalOperationsSecret: config.INTERNAL_OPERATIONS_SECRET,
+    aiProviderMode: config.AI_PROVIDER_MODE,
     appUrl: config.NEXT_PUBLIC_APP_URL,
     betaAccountCap: config.BETA_ACCOUNT_CAP,
     dailyAiCallLimit: config.DAILY_AI_CALL_LIMIT,
