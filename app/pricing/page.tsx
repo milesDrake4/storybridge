@@ -7,7 +7,7 @@ export default function PricingPage() {
   const facts = getPublicProductFacts();
   return (
     <PublicShell>
-      <main className="public-page">
+      <main className="public-page" id="main-content" tabIndex={-1}>
         <header className="public-page-heading">
           <p className="eyebrow">2026–2027 application season</p>
           <h1>Simple beta pricing.</h1>

@@ -2,6 +2,8 @@
 
 import { type FormEvent, useState } from "react";
 
+import { AsyncStatus } from "@/components/ui/async-status";
+
 type AccessFormProps = {
   initialError?: string;
   inviteToken?: string;
@@ -90,12 +92,9 @@ export function AccessForm({ initialError, inviteToken }: AccessFormProps) {
         {submitting ? "Sending…" : "Email me a link"}
       </button>
       {message ? (
-        <p
-          className={messageKind === "error" ? "form-error" : "form-status"}
-          role={messageKind === "error" ? "alert" : "status"}
-        >
+        <AsyncStatus kind={messageKind === "error" ? "error" : "status"}>
           {message}
-        </p>
+        </AsyncStatus>
       ) : null}
     </form>
   );

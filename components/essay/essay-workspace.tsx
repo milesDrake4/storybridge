@@ -16,6 +16,7 @@ import { PlainTextEditor } from "@/components/essay/plain-text-editor";
 import { CoachPanel } from "@/components/essay/coach-panel";
 import { ReferenceDraftPanel } from "@/components/essay/reference-draft-panel";
 import { FinalReview } from "@/components/essay/final-review";
+import { CollapsibleWorkspacePanel } from "@/components/ui/collapsible-workspace-panel";
 
 type Props = { essayId: string; initialWorkspace?: EssayWorkspaceValue };
 
@@ -171,19 +172,25 @@ export function EssayWorkspace({ essayId, initialWorkspace }: Props) {
         />
       ) : null}
       {workspace.essay.outline ? (
-        <CoachPanel essayId={workspace.essay.id} />
+        <CollapsibleWorkspacePanel title="Coaching tools">
+          <CoachPanel essayId={workspace.essay.id} />
+        </CollapsibleWorkspacePanel>
       ) : null}
       {workspace.essay.outline ? (
-        <ReferenceDraftPanel
-          essayId={workspace.essay.id}
-          initialProposal={workspace.referenceDraft ?? null}
-        />
+        <CollapsibleWorkspacePanel title="Reference draft controls">
+          <ReferenceDraftPanel
+            essayId={workspace.essay.id}
+            initialProposal={workspace.referenceDraft ?? null}
+          />
+        </CollapsibleWorkspacePanel>
       ) : null}
       {workspace.essay.outline ? (
-        <FinalReview
-          essayId={workspace.essay.id}
-          essayRevision={workspace.essay.revision}
-        />
+        <CollapsibleWorkspacePanel title="Final review and export">
+          <FinalReview
+            essayId={workspace.essay.id}
+            essayRevision={workspace.essay.revision}
+          />
+        </CollapsibleWorkspacePanel>
       ) : null}
       <Link className="button button-secondary" href="/essays">
         Back to essays

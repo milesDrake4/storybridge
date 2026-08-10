@@ -14,7 +14,7 @@ export default async function SignInPage({ searchParams }: SignInPageProps) {
   const query = await searchParams;
 
   return (
-    <main className="auth-page">
+    <main className="auth-page" id="main-content" tabIndex={-1}>
       <Link className="wordmark" href="/">
         StoryBridge
       </Link>

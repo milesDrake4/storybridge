@@ -59,6 +59,13 @@ export function ResearchPanel({
   const [notice, setNotice] = useState<string | null>(null);
   const [confirmingRefresh, setConfirmingRefresh] = useState(false);
   const pendingKey = useRef<string | null>(null);
+  const refreshButton = useRef<HTMLButtonElement>(null);
+  const researchHeading = useRef<HTMLHeadingElement>(null);
+
+  function cancelRefresh() {
+    setConfirmingRefresh(false);
+    window.requestAnimationFrame(() => refreshButton.current?.focus());
+  }
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -133,6 +140,7 @@ export function ResearchPanel({
       currentRevision.current = nextRevision;
       onRevisionChange?.(nextRevision);
       setConfirmingRefresh(false);
+      window.requestAnimationFrame(() => researchHeading.current?.focus());
     } catch {
       setNotice(errorCopy(null));
     } finally {
@@ -156,7 +164,9 @@ export function ResearchPanel({
     <section className="research-panel" aria-labelledby="research-heading">
       <header>
         <p className="eyebrow">Verified-domain research</p>
-        <h2 id="research-heading">School evidence</h2>
+        <h2 id="research-heading" ref={researchHeading} tabIndex={-1}>
+          School evidence
+        </h2>
       </header>
       {notice ? (
         <p className="research-notice" role="alert">
@@ -214,13 +224,14 @@ export function ResearchPanel({
           {confirmingRefresh ? (
             <RefreshResearchDialog
               busy={researching}
-              onCancel={() => setConfirmingRefresh(false)}
+              onCancel={cancelRefresh}
               onConfirm={() => void research(true)}
             />
           ) : (
             <button
               className="button button-secondary research-refresh-button"
               disabled={researching}
+              ref={refreshButton}
               onClick={() => {
                 setNotice(null);
                 setConfirmingRefresh(true);

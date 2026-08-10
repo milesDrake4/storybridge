@@ -36,6 +36,27 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+main,
+article,
+section,
+aside,
+nav,
+div {
+  min-width: 0;
+}
+
+img,
+svg,
+video {
+  height: auto;
+  max-width: 100%;
+}
+
+pre,
+code {
+  max-width: 100%;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -90,9 +111,27 @@ textarea {
 a:focus-visible,
 input:focus-visible,
 select:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+summary:focus-visible,
+[tabindex="-1"]:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 3px;
+}
+
+.skip-link {
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 800;
+  left: 1rem;
+  padding: 0.75rem 1rem;
+  position: fixed;
+  top: 0;
+  transform: translateY(-150%);
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  transform: translateY(1rem);
 }
 
 .button:disabled {
@@ -264,7 +303,7 @@ textarea:focus-visible {
 }
 
 .field-input::placeholder {
-  color: #778179;
+  color: #626d65;
 }
 
 .form-error,
@@ -278,6 +317,27 @@ textarea:focus-visible {
 .form-error {
   border-left-color: #a43e32;
   color: #762b23;
+}
+
+.error-summary {
+  border: 2px solid #a43e32;
+  color: #762b23;
+  display: grid;
+  gap: 0.65rem;
+  padding: 1rem;
+}
+
+.error-summary h2,
+.error-summary p {
+  font-size: 1rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.error-summary a {
+  color: var(--accent-strong);
+  font-weight: 800;
+  text-decoration: underline;
 }
 
 .auth-footnote {
@@ -728,6 +788,45 @@ textarea:focus-visible {
   gap: 0.75rem;
 }
 
+.workspace-disclosure {
+  border-top: 1px solid var(--line);
+  margin-top: 2rem;
+}
+
+.workspace-disclosure > summary {
+  color: var(--ink);
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 800;
+  min-height: 2.75rem;
+  padding: 1rem 2.25rem 1rem 0;
+  position: relative;
+}
+
+.workspace-disclosure > summary::after {
+  color: var(--accent-strong);
+  content: "+";
+  font-family: monospace;
+  font-size: 1.25rem;
+  position: absolute;
+  right: 0;
+}
+
+.workspace-disclosure[open] > summary::after {
+  content: "−";
+}
+
+.workspace-disclosure-content > :first-child {
+  margin-top: 0;
+}
+
+@media (min-width: 80rem) {
+  .workspace-disclosure > summary {
+    position: sticky;
+    top: 0;
+  }
+}
+
 .research-panel {
   border-top: 2px solid var(--accent);
   margin-top: 3rem;
@@ -1118,7 +1217,7 @@ textarea:focus-visible {
 }
 
 .interview-answer-field textarea::placeholder {
-  color: #778179;
+  color: #626d65;
 }
 
 .answer-meta {
@@ -2059,6 +2158,15 @@ textarea:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
   html {
     scroll-behavior: auto;
   }

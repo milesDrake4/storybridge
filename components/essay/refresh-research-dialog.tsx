@@ -19,6 +19,9 @@ export function RefreshResearchDialog({ busy, onCancel, onConfirm }: Props) {
       aria-labelledby="refresh-research-heading"
       aria-describedby="refresh-research-description"
       className="research-refresh-warning"
+      onKeyDown={(event) => {
+        if (event.key === "Escape" && !busy) onCancel();
+      }}
       role="alertdialog"
     >
       <h3 id="refresh-research-heading" ref={heading} tabIndex={-1}>

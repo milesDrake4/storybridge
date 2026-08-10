@@ -47,7 +47,9 @@ export default async function ProductLayout({
           <Link href="/essays">Essays</Link>
           <Link href="/settings">Settings</Link>
         </nav>
-        <main className="product-main">{children}</main>
+        <main className="product-main" id="main-content" tabIndex={-1}>
+          {children}
+        </main>
       </div>
     </div>
   );

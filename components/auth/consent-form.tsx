@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { type FormEvent, useState } from "react";
 
+import { ErrorSummary } from "@/components/ui/error-summary";
 import { CURRENT_POLICY_VERSIONS } from "@/services/auth/eligibility";
 
 type ConsentFormProps = {
@@ -116,9 +117,7 @@ export function ConsentForm({ currentYear, onComplete }: ConsentFormProps) {
         {submitting ? "Saving…" : "Enter StoryBridge"}
       </button>
       {error ? (
-        <p className="form-error" role="alert">
-          {error}
-        </p>
+        <ErrorSummary title="Consent was not saved">{error}</ErrorSummary>
       ) : null}
     </form>
   );

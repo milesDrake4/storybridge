@@ -62,7 +62,7 @@ export function PolicyPage({
 }) {
   return (
     <PublicShell>
-      <main className="policy-page">
+      <main className="policy-page" id="main-content" tabIndex={-1}>
         <article>
           <p className="eyebrow">{eyebrow}</p>
           <h1>{title}</h1>
