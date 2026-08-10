@@ -10,6 +10,8 @@ import {
   isRetryableError,
   publicErrorMessageByCode,
 } from "@/contracts/http/v1/errors";
+import { serverLogger } from "@/lib/observability/logger";
+import { alertForApplicationError } from "@/services/observability/alerts";
 
 type SuccessHttpStatus = 200 | 201 | 202;
 
@@ -82,6 +84,17 @@ export function createErrorResponse(
     },
     meta: { requestId },
   };
+
+  if (process.env.NODE_ENV === "production") {
+    serverLogger.write({
+      errorCode: code,
+      event: "request_failed",
+      level: errorStatusByCode[code] >= 500 ? "error" : "warn",
+      requestId,
+    });
+    const alert = alertForApplicationError(code, requestId);
+    if (alert) serverLogger.write(alert);
+  }
 
   return new Response(JSON.stringify(body), {
     headers: createJsonHeaders(requestId, options.headers),

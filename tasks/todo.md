@@ -74,7 +74,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 ## Slice 8: Production launch
 
-- [ ] 38. Add content-free analytics and operational visibility
+- [x] 38. Add content-free analytics and operational visibility
 - [ ] 39. Publish accurate marketing, policy, and support surfaces
 - [ ] 40. Complete responsive accessibility audit
 - [ ] 41. Automate CI and preview deployment gates

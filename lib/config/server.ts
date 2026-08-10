@@ -78,14 +78,14 @@ const rawServerConfigSchema = z
     IP_HMAC_SECRET: hmacSecretSchema,
     CONTENT_HMAC_SECRET: hmacSecretSchema,
     IDEMPOTENCY_HMAC_SECRET: hmacSecretSchema,
-    ACCOUNT_DELETION_WORKER_SECRET: hmacSecretSchema.optional(),
+    INTERNAL_OPERATIONS_SECRET: hmacSecretSchema.optional(),
   })
   .superRefine((config, context) => {
     const secrets = [
       config.IP_HMAC_SECRET,
       config.CONTENT_HMAC_SECRET,
       config.IDEMPOTENCY_HMAC_SECRET,
-      config.ACCOUNT_DELETION_WORKER_SECRET,
+      config.INTERNAL_OPERATIONS_SECRET,
     ].filter((value): value is string => value !== undefined);
     if (new Set(secrets).size !== secrets.length) {
       context.addIssue({
@@ -106,9 +106,15 @@ export type ServerConfig = ReturnType<typeof parseServerConfig>;
 
 export function parseServerConfig(environment: Record<string, unknown>) {
   const config = rawServerConfigSchema.parse(environment);
+  const productionRuntime =
+    environment.NODE_ENV === "production" &&
+    environment.NEXT_PHASE !== "phase-production-build";
+  if (productionRuntime && !config.INTERNAL_OPERATIONS_SECRET) {
+    throw new Error("INTERNAL_OPERATIONS_SECRET is required in production");
+  }
 
   return {
-    accountDeletionWorkerSecret: config.ACCOUNT_DELETION_WORKER_SECRET,
+    internalOperationsSecret: config.INTERNAL_OPERATIONS_SECRET,
     appUrl: config.NEXT_PUBLIC_APP_URL,
     betaAccountCap: config.BETA_ACCOUNT_CAP,
     dailyAiCallLimit: config.DAILY_AI_CALL_LIMIT,

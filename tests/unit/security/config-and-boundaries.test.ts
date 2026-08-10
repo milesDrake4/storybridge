@@ -90,6 +90,20 @@ describe("server configuration", () => {
     await expect(register()).rejects.toThrow();
   });
 
+  it("requires the internal operations secret at production runtime", () => {
+    expect(() =>
+      parseServerConfig({ ...validEnvironment, NODE_ENV: "production" }),
+    ).toThrow("INTERNAL_OPERATIONS_SECRET");
+    expect(
+      parseServerConfig({
+        ...validEnvironment,
+        INTERNAL_OPERATIONS_SECRET:
+          "operations-secret-abcdefghijklmnopqrstuvwxyz",
+        NODE_ENV: "production",
+      }).internalOperationsSecret,
+    ).toBe("operations-secret-abcdefghijklmnopqrstuvwxyz");
+  });
+
   it.each([
     ["NEXT_PUBLIC_APP_URL", "javascript:alert(1)"],
     ["OPENAI_MODEL", ""],
