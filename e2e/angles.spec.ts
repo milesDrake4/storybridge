@@ -159,7 +159,7 @@ test("compares evidence-linked angles and preserves selection on reload", async 
   );
 
   await page.goto(`/essays/${essayId}`);
-  await expect(page.getByText("Strategy 1", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Strategy 1" })).toBeVisible();
   await expect(
     page.getByText("Built community through a repair workshop.").first(),
   ).toBeVisible();

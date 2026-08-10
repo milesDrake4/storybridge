@@ -20,9 +20,14 @@ for (const publicPage of publicPages) {
     await expect(
       page.getByRole("navigation", { name: "Primary" }),
     ).toBeVisible();
-    await expect(page.getByRole("contentinfo")).toBeVisible();
-    await expect(page.getByRole("link", { name: "Privacy" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Support" })).toBeVisible();
+    const footer = page.getByRole("contentinfo");
+    await expect(footer).toBeVisible();
+    await expect(
+      footer.getByRole("link", { exact: true, name: "Privacy" }),
+    ).toBeVisible();
+    await expect(
+      footer.getByRole("link", { exact: true, name: "Support" }),
+    ).toBeVisible();
   });
 }
 

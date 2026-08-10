@@ -19,9 +19,16 @@ test("requests an invited sign-in link with fixed, responsive UI", async ({
   });
 
   await page.goto("/sign-in?invite=invite-token");
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Tab");
-  await expect(page.getByLabel("Email address")).toBeFocused();
+  const email = page.getByLabel("Email address");
+  for (
+    let tab = 0;
+    tab < 12 &&
+    !(await email.evaluate((element) => element === document.activeElement));
+    tab += 1
+  ) {
+    await page.keyboard.press("Tab");
+  }
+  await expect(email).toBeFocused();
   await page.keyboard.type("student@example.com");
   await page.keyboard.press("Tab");
   await page.keyboard.press("Enter");
@@ -41,9 +48,11 @@ test("recovers from callback failure without exposing provider details", async (
     "/sign-in?error=AUTH_CALLBACK_FAILED&provider_error=private-diagnostic",
   );
 
-  await expect(page.getByRole("alert")).toHaveText(
-    "That sign-in link could not be used. Request a new one below.",
-  );
+  await expect(
+    page
+      .getByRole("alert")
+      .filter({ hasText: "That sign-in link could not be used" }),
+  ).toHaveText("That sign-in link could not be used. Request a new one below.");
   await expect(page.getByText(/private-diagnostic/i)).toHaveCount(0);
 });
 

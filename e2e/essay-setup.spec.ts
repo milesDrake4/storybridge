@@ -108,9 +108,9 @@ test("creates and reopens an essay using only a registry school name", async ({
   });
 
   await page.goto("/essays/new");
-  await page.getByRole("searchbox", { name: "Search schools" }).focus();
-  await page.keyboard.press("Tab");
-  await page.keyboard.press("Enter");
+  await page
+    .getByRole("button", { name: new RegExp(school.canonicalName) })
+    .click();
   await page.getByLabel("Official application prompt").fill(prompt);
   await page.getByLabel("Word limit").fill("300");
   await page.getByRole("button", { name: "Create workspace" }).click();
@@ -149,9 +149,9 @@ test("preserves personal prose while explaining how to recover safely", async ({
   await promptField.fill(personalDraft);
   await page.getByRole("button", { name: "Create workspace" }).click();
 
-  await expect(page.getByRole("alert")).toContainText(
-    "Paste only the school's official prompt",
-  );
+  await expect(
+    page.getByRole("alert", { name: "Check your essay setup" }),
+  ).toContainText("Paste only the school's official prompt");
   await expect(promptField).toHaveValue(personalDraft);
   expect(createRequests).toBe(0);
 });

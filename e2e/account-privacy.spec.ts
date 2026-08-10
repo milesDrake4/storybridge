@@ -32,7 +32,7 @@ const envelope = (data: unknown) => ({
 test("downloads private data and preserves one-time deletion status access", async ({
   page,
 }) => {
-  await page.route("**/api/v1/me/export", (route) =>
+  await page.route("**/api/v1/me/export**", (route) =>
     route.fulfill({
       body: JSON.stringify({
         data: { essays: [] },
