@@ -614,6 +614,7 @@ export type Database = {
       create_essay_workspace: {
         Args: {
           requested_at?: string;
+          requested_free_essay_limit: number;
           requested_idempotency_key_hmac: string;
           requested_prompt: string;
           requested_request_hmac: string;
@@ -621,6 +622,15 @@ export type Database = {
           requested_season: string;
           requested_user_id: string;
           requested_word_limit: number;
+        };
+        Returns: Json;
+      };
+      get_billing_entitlement: {
+        Args: {
+          requested_at?: string;
+          requested_default_free_limit: number;
+          requested_season: string;
+          requested_user_id: string;
         };
         Returns: Json;
       };

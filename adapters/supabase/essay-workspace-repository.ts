@@ -149,6 +149,7 @@ export function createSupabaseEssayWorkspaceRepository(
         .schema("private")
         .rpc("create_essay_workspace", {
           requested_at: input.now.toISOString(),
+          requested_free_essay_limit: config.freeEssayLimit,
           requested_idempotency_key_hmac: input.idempotencyKeyHmac,
           requested_prompt: input.prompt,
           requested_request_hmac: input.requestHmac,
