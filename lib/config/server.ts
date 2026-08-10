@@ -12,6 +12,10 @@ const nonNegativeIntegerString = z
   .transform(Number)
   .pipe(z.number().int().safe());
 
+export function parseSeasonPassPriceCents(value: unknown): number {
+  return positiveIntegerString.parse(value);
+}
+
 const appUrlSchema = z
   .string()
   .url()

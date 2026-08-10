@@ -364,6 +364,51 @@ textarea:focus-visible {
   line-height: 1.7;
 }
 
+.season-pass-panel {
+  align-items: center;
+  background: color-mix(in srgb, var(--paper) 90%, var(--accent) 10%);
+  border: 1px solid var(--line);
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: minmax(0, 1fr);
+  margin-top: 2.5rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.season-pass-panel h2 {
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  margin: 0.4rem 0 0.65rem;
+}
+
+.season-pass-panel p {
+  line-height: 1.55;
+}
+
+.season-pass-note {
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin-bottom: 0;
+  max-width: 42rem;
+}
+
+.season-pass-panel > div:last-child {
+  display: grid;
+  gap: 0.75rem;
+  justify-items: start;
+}
+
+.season-pass-panel > div:last-child p[role="alert"] {
+  color: #8b3028;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.season-pass-price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  margin: 0;
+}
+
 .essay-empty {
   border-top: 1px solid var(--line);
   margin-top: 3rem;
@@ -1595,6 +1640,10 @@ textarea:focus-visible {
 
   .interview-workspace {
     grid-template-columns: minmax(11rem, 0.65fr) minmax(0, 2fr);
+  }
+
+  .season-pass-panel {
+    grid-template-columns: minmax(0, 1fr) auto;
   }
 }
 

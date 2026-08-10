@@ -66,3 +66,7 @@ export type SchoolId = z.infer<typeof schoolIdSchema>;
 export const schoolRequestIdSchema =
   canonicalUuidSchema.brand<"SchoolRequestId">();
 export type SchoolRequestId = z.infer<typeof schoolRequestIdSchema>;
+
+export const checkoutBindingIdSchema =
+  canonicalUuidSchema.brand<"CheckoutBindingId">();
+export type CheckoutBindingId = z.infer<typeof checkoutBindingIdSchema>;
