@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { userIdSchema } from "@/contracts/domain/ids";
+import { accountDeletionIdSchema, userIdSchema } from "@/contracts/domain/ids";
 import { rfc3339UtcSchema } from "@/contracts/http/v1/common";
 
 const policyVersionSchema = z.string().trim().min(1).max(100);
@@ -28,3 +28,35 @@ export const profileSchema = z.object({
   userId: userIdSchema,
 });
 export type Profile = z.infer<typeof profileSchema>;
+
+export const deleteAccountInputSchema = z.strictObject({
+  confirmation: z.literal("DELETE"),
+});
+export type DeleteAccountInput = z.infer<typeof deleteAccountInputSchema>;
+
+export const accountDeletionStatusSchema = z.enum([
+  "QUEUED",
+  "PROCESSING",
+  "COMPLETE",
+  "FAILED",
+]);
+export const deletionStatusTokenSchema = z
+  .string()
+  .regex(/^dst_v1_[A-Za-z0-9_-]{43}$/);
+
+export const deletionRequestSchema = z.strictObject({
+  deletionId: accountDeletionIdSchema,
+  status: z.literal("QUEUED"),
+  statusToken: deletionStatusTokenSchema,
+});
+export type DeletionRequest = z.infer<typeof deletionRequestSchema>;
+
+export const accountDeletionStatusResponseSchema = z.strictObject({
+  completedAt: rfc3339UtcSchema.nullable(),
+  deletionId: accountDeletionIdSchema,
+  requestedAt: rfc3339UtcSchema,
+  status: accountDeletionStatusSchema,
+});
+export type AccountDeletionStatusResponse = z.infer<
+  typeof accountDeletionStatusResponseSchema
+>;
