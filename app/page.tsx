@@ -1,115 +1,102 @@
+import Link from "next/link";
+
+import { PublicShell } from "@/components/marketing/public-shell";
+
 const steps = [
   {
     number: "01",
     title: "Build your Story Vault",
-    body: "Complete one guided interview, then review every experience, value, and goal before it is used.",
+    body: "Complete one guided interview, then review every experience, value, and goal before it can support coaching.",
   },
   {
     number: "02",
     title: "Find a specific angle",
-    body: "Connect your verified stories to cited opportunities at each school—not generic praise anyone could write.",
+    body: "Connect your verified stories to cited opportunities on an operator-verified school domain.",
   },
   {
     number: "03",
     title: "Write in your own voice",
-    body: "Start with a clear outline, draft directly, and choose whether to accept any sentence-level suggestion.",
+    body: "Start from an outline, draft directly, and decide whether to accept each sentence-level proposal.",
   },
 ] as const;
 
 export default function HomePage() {
   return (
-    <main>
-      <nav
-        className="mx-auto flex max-w-6xl items-center justify-between px-5 py-6 sm:px-8"
-        aria-label="Primary"
-      >
-        <a
-          className="text-lg font-semibold tracking-tight text-ink"
-          href="#top"
-          aria-label="StoryBridge home"
-        >
-          StoryBridge
-        </a>
-        <a className="button button-secondary" href="#how-it-works">
-          See how it works
-        </a>
-      </nav>
-
-      <section
-        id="top"
-        className="mx-auto grid max-w-6xl gap-12 px-5 pb-20 pt-14 sm:px-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end lg:pb-28 lg:pt-24"
-      >
-        <div>
-          <p className="eyebrow">College essays, coached—not outsourced</p>
-          <h1 className="mt-5 max-w-4xl text-balance text-5xl font-semibold leading-[0.98] tracking-[-0.045em] text-ink sm:text-6xl lg:text-7xl">
-            Discover what only you can say.
-          </h1>
-          <p className="mt-7 max-w-2xl text-pretty text-lg leading-8 text-muted sm:text-xl">
-            StoryBridge turns one honest interview into school-specific
-            strategy, a practical outline, and writing guidance that keeps you
-            in control.
-          </p>
-          <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-            <span className="button button-primary" aria-disabled="true">
-              Closed beta coming soon
-            </span>
-            <span className="self-center text-sm text-muted">
-              First essay workspace will be free.
-            </span>
-          </div>
-        </div>
-
-        <aside
-          className="border-l-2 border-accent pl-6 lg:mb-2"
-          aria-label="Product commitment"
-        >
-          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-accent-strong">
-            Our commitment
-          </p>
-          <p className="mt-4 text-xl leading-8 text-ink">
-            Your experiences stay factual. School claims stay cited. AI
-            suggestions never enter your draft without your choice.
-          </p>
-        </aside>
-      </section>
-
-      <section
-        id="how-it-works"
-        className="border-y border-line bg-paper-strong"
-      >
-        <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
-          <div className="max-w-2xl">
-            <p className="eyebrow">A better starting point</p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-[-0.025em] text-ink sm:text-4xl">
-              Strategy before sentences.
-            </h2>
-            <p className="mt-4 text-lg leading-8 text-muted">
-              The product is designed around the work a strong advisor would do
-              with you, in the order that work actually helps.
+    <PublicShell>
+      <main>
+        <section className="public-hero" id="top">
+          <div>
+            <p className="eyebrow">College essays, coached—not outsourced</p>
+            <h1>Discover what only you can say.</h1>
+            <p className="public-lede">
+              StoryBridge turns one honest interview into school-specific
+              strategy, a practical outline, and writing guidance that keeps you
+              in control.
+            </p>
+            <div className="public-actions">
+              <Link className="button button-primary" href="/sign-in">
+                Invited? Sign in
+              </Link>
+              <Link className="button button-secondary" href="/pricing">
+                View beta pricing
+              </Link>
+            </div>
+            <p className="beta-boundary">
+              Invitation-only closed beta for US applicants who attest they are
+              18 or older. Enrollment is capped at 25 accepted accounts.
             </p>
           </div>
+          <aside aria-label="Product commitment">
+            <p className="eyebrow">Our commitment</p>
+            <p>
+              Your experiences stay factual. School claims stay cited. AI
+              suggestions never enter your draft without your choice.
+            </p>
+          </aside>
+        </section>
 
-          <ol className="mt-12 grid border-t border-line lg:grid-cols-3">
-            {steps.map((step) => (
-              <li
-                className="border-b border-line py-8 lg:border-b-0 lg:border-r lg:px-8 lg:first:pl-0 lg:last:border-r-0"
-                key={step.number}
-              >
-                <span
-                  className="font-mono text-sm text-accent-strong"
-                  aria-hidden="true"
-                >
-                  {step.number}
-                </span>
-                <h3 className="mt-8 text-xl font-semibold text-ink">
-                  {step.title}
-                </h3>
-                <p className="mt-3 leading-7 text-muted">{step.body}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </section>
-    </main>
+        <section className="public-band" id="how-it-works">
+          <div className="public-section">
+            <div className="public-section-heading">
+              <p className="eyebrow">A better starting point</p>
+              <h2>Strategy before sentences.</h2>
+              <p>
+                The product follows the work a thoughtful advisor would do with
+                you, while preserving your authorship and responsibility.
+              </p>
+            </div>
+            <ol className="public-steps">
+              {steps.map((step) => (
+                <li key={step.number}>
+                  <span aria-hidden="true">{step.number}</span>
+                  <h3>{step.title}</h3>
+                  <p>{step.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </section>
+
+        <section className="public-section public-integrity">
+          <div>
+            <p className="eyebrow">A boundary, not a shortcut</p>
+            <h2>Coaching deliverables. No admission promises.</h2>
+          </div>
+          <div>
+            <p>
+              StoryBridge can help you organize evidence, explore an angle,
+              shape an outline, and review a draft. It does not predict or
+              guarantee admission, and it does not submit applications.
+            </p>
+            <p>
+              If you use the one read-only AI reference draft available for an
+              essay, you must make meaningful revisions. It cannot be accepted
+              into or exported from your student draft.
+            </p>
+            <Link href="/responsible-use">Read the Responsible Use Policy</Link>
+          </div>
+        </section>
+      </main>
+    </PublicShell>
   );
 }
