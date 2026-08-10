@@ -111,6 +111,87 @@ textarea:focus-visible {
   white-space: nowrap;
 }
 
+.privacy-shell {
+  margin: 0 auto;
+  max-width: 76rem;
+  min-height: 100svh;
+  padding: 0 1.25rem 5rem;
+}
+
+.privacy-main {
+  margin-top: clamp(3rem, 8vw, 7rem);
+  max-width: 62rem;
+}
+
+.privacy-main > h1 {
+  font-size: clamp(2.4rem, 7vw, 5rem);
+  font-weight: 600;
+  letter-spacing: -0.05em;
+  line-height: 0.96;
+  margin: 1rem 0 0;
+  text-wrap: balance;
+}
+
+.privacy-intro {
+  color: var(--muted);
+  font-size: 1.075rem;
+  line-height: 1.7;
+  max-width: 44rem;
+}
+
+.privacy-controls {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 3rem;
+}
+
+.privacy-card {
+  border: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1.25rem, 4vw, 2rem);
+}
+
+.privacy-card h2,
+.privacy-card h3,
+.privacy-card p {
+  margin: 0;
+}
+
+.privacy-card > p:not(.eyebrow, .form-error, .form-status) {
+  color: var(--muted);
+  line-height: 1.65;
+}
+
+.privacy-card .button,
+.privacy-card .field-input {
+  align-self: flex-start;
+}
+
+.privacy-danger {
+  border-top: 3px solid #762b23;
+}
+
+.deletion-receipt {
+  display: grid;
+  gap: 1rem;
+}
+
+.deletion-receipt code {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  overflow-wrap: anywhere;
+  padding: 0.8rem;
+}
+
+@media (max-width: 48rem) {
+  .privacy-controls {
+    grid-template-columns: 1fr;
+  }
+}
+
 .wordmark {
   font-size: 1.125rem;
   font-weight: 700;
