@@ -70,3 +70,7 @@ export type SchoolRequestId = z.infer<typeof schoolRequestIdSchema>;
 export const checkoutBindingIdSchema =
   canonicalUuidSchema.brand<"CheckoutBindingId">();
 export type CheckoutBindingId = z.infer<typeof checkoutBindingIdSchema>;
+
+export const accountDeletionIdSchema =
+  canonicalUuidSchema.brand<"AccountDeletionId">();
+export type AccountDeletionId = z.infer<typeof accountDeletionIdSchema>;
