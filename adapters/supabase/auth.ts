@@ -141,8 +141,9 @@ export function createSupabaseCompleteMagicLinkDependencies(
 export function createSupabaseAuthenticatedSession(
   config: ServerConfig,
   cookies: CookieMethodsServer,
-): AuthenticatedSession {
+): AuthenticatedSession & { revokeAll(): Promise<void> } {
   const client = createSupabaseSessionClient(config, cookies);
+  const secretClient = createSupabaseSecretClient(config);
   return {
     async requireUserId() {
       const { data, error } = await client.auth.getClaims();
@@ -159,7 +160,20 @@ export function createSupabaseAuthenticatedSession(
           data?.claims ? "SESSION_EXPIRED" : "AUTH_REQUIRED",
         );
       }
+      const { data: deletion, error: deletionError } = await secretClient
+        .schema("private")
+        .from("account_deletions")
+        .select("id")
+        .eq("user_id", userId.data)
+        .limit(1)
+        .maybeSingle();
+      if (deletionError) throw deletionError;
+      if (deletion) throw new EligibilityError("SESSION_EXPIRED");
       return userId.data;
+    },
+    async revokeAll() {
+      const { error } = await client.auth.signOut({ scope: "global" });
+      if (error) throw error;
     },
   };
 }
