@@ -282,6 +282,64 @@ export type Database = {
         };
         Relationships: [];
       };
+      stripe_events: {
+        Row: {
+          binding_id: string | null;
+          created_at: string;
+          event_id: string;
+          event_type: string;
+          operator_alert_required: boolean;
+          payload_hmac: string;
+          processed_at: string | null;
+          provider_created_at: string;
+          received_at: string;
+          safe_failure_code: string | null;
+          status: string;
+          stripe_charge_id: string | null;
+          stripe_checkout_session_id: string | null;
+          stripe_customer_id: string | null;
+          stripe_payment_intent_id: string | null;
+          updated_at: string;
+        };
+        Insert: {
+          binding_id?: string | null;
+          created_at?: string;
+          event_id: string;
+          event_type: string;
+          operator_alert_required?: boolean;
+          payload_hmac: string;
+          processed_at?: string | null;
+          provider_created_at: string;
+          received_at: string;
+          safe_failure_code?: string | null;
+          status?: string;
+          stripe_charge_id?: string | null;
+          stripe_checkout_session_id?: string | null;
+          stripe_customer_id?: string | null;
+          stripe_payment_intent_id?: string | null;
+          updated_at?: string;
+        };
+        Update: Partial<
+          Database["private"]["Tables"]["stripe_events"]["Insert"]
+        >;
+        Relationships: [];
+      };
+      stripe_reversal_tombstones: {
+        Row: {
+          binding_id: string;
+          processed_at: string;
+          provider_created_at: string;
+          source_event_id: string;
+          stripe_charge_id: string;
+          stripe_payment_intent_id: string;
+          terminal_state: string;
+        };
+        Insert: Database["private"]["Tables"]["stripe_reversal_tombstones"]["Row"];
+        Update: Partial<
+          Database["private"]["Tables"]["stripe_reversal_tombstones"]["Row"]
+        >;
+        Relationships: [];
+      };
       entitlements: {
         Row: {
           created_at: string;
@@ -465,6 +523,32 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      commit_stripe_event: {
+        Args: {
+          requested_action: string;
+          requested_alert_operator: boolean;
+          requested_amount_cents: number | null;
+          requested_binding_id: string | null;
+          requested_charge_id: string | null;
+          requested_currency: string | null;
+          requested_customer_id: string | null;
+          requested_event_created_at: string;
+          requested_event_id: string;
+          requested_event_type: string;
+          requested_livemode: boolean;
+          requested_mode: string | null;
+          requested_now: string;
+          requested_paid_essay_limit: number;
+          requested_payload_hmac: string;
+          requested_payment_intent_id: string | null;
+          requested_price_id: string | null;
+          requested_safe_failure_code: string | null;
+          requested_season: string | null;
+          requested_session_id: string | null;
+          requested_user_binding_hmac: string | null;
+        };
+        Returns: string;
+      };
       finalize_checkout_session: {
         Args: {
           requested_at?: string;

@@ -81,7 +81,11 @@ async function readBoundedBody(
   const contentLength = request.headers.get("content-length");
   if (contentLength !== null) {
     const declaredLength = Number(contentLength);
-    if (!Number.isSafeInteger(declaredLength) || declaredLength > maxBytes) {
+    if (
+      !Number.isSafeInteger(declaredLength) ||
+      declaredLength < 0 ||
+      declaredLength > maxBytes
+    ) {
       throw new RequestBoundaryError("VALIDATION_ERROR");
     }
   }
@@ -110,6 +114,19 @@ async function readBoundedBody(
     offset += chunk.byteLength;
   }
   return body;
+}
+
+export async function readRawJsonBody(
+  request: Request,
+  maxBytes = DEFAULT_MAX_JSON_BYTES,
+): Promise<Uint8Array> {
+  const contentType = request.headers.get("content-type");
+  if (
+    contentType?.split(";", 1)[0]?.trim().toLowerCase() !== "application/json"
+  ) {
+    throw new RequestBoundaryError("INVALID_CONTENT_TYPE");
+  }
+  return readBoundedBody(request, maxBytes);
 }
 
 export async function readJsonBody<Schema extends z.ZodType>(
