@@ -35,7 +35,7 @@ export default async function SettingsPage() {
         </Link>
         <span className="beta-badge">Account settings</span>
       </header>
-      <main className="privacy-main">
+      <main className="privacy-main" id="main-content" tabIndex={-1}>
         <p className="eyebrow">Privacy controls</p>
         <h1>Keep your data in your hands.</h1>
         <p className="privacy-intro">

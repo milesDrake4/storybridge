@@ -23,7 +23,7 @@ const steps = [
 export default function HomePage() {
   return (
     <PublicShell>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="public-hero" id="top">
           <div>
             <p className="eyebrow">College essays, coached—not outsourced</p>

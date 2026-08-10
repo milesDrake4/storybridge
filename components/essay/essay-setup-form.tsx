@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState } from "react";
 
 import { SchoolPicker } from "@/components/essay/school-picker";
+import { ErrorSummary } from "@/components/ui/error-summary";
 import {
   apiErrorSchema,
   apiSuccessSchema,
@@ -197,12 +198,12 @@ export function EssaySetupForm({ initialSchools, onCreated }: Props) {
       </div>
 
       {error ? (
-        <div className="essay-form-error" role="alert">
+        <ErrorSummary title="Check your essay setup">
           <p>{error.message}</p>
           {error.recovery === "ESSAYS" ? (
             <Link href="/essays">Open your essays</Link>
           ) : null}
-        </div>
+        </ErrorSummary>
       ) : null}
 
       <button

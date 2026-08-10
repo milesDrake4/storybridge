@@ -4,7 +4,7 @@ import { ConsentForm } from "@/components/auth/consent-form";
 
 export default function ConsentPage() {
   return (
-    <main className="auth-page">
+    <main className="auth-page" id="main-content" tabIndex={-1}>
       <Link className="wordmark" href="/">
         StoryBridge
       </Link>

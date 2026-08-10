@@ -57,6 +57,18 @@ export function AnglePicker({
   const [followUp, setFollowUp] = useState<string | null>(null);
   const [confirmRegenerate, setConfirmRegenerate] = useState(false);
   const generationKey = useRef<string | null>(null);
+  const regenerateButton = useRef<HTMLButtonElement>(null);
+  const regenerateHeading = useRef<HTMLHeadingElement>(null);
+  const angleHeading = useRef<HTMLHeadingElement>(null);
+
+  function cancelRegeneration() {
+    setConfirmRegenerate(false);
+    window.requestAnimationFrame(() => regenerateButton.current?.focus());
+  }
+
+  useEffect(() => {
+    if (confirmRegenerate) regenerateHeading.current?.focus();
+  }, [confirmRegenerate]);
 
   const loadEvidence = useCallback(async () => {
     const [researchResponse, profileResponse] = await Promise.all([
@@ -145,6 +157,9 @@ export function AnglePicker({
       generationKey.current = null;
       setAngles(parsed.data.data.angles);
       setConfirmRegenerate(false);
+      if (regenerate) {
+        window.requestAnimationFrame(() => angleHeading.current?.focus());
+      }
       await loadEvidence();
     } catch {
       setNotice(
@@ -244,7 +259,9 @@ export function AnglePicker({
     <section className="angle-picker" aria-labelledby="angle-picker-heading">
       <header>
         <p className="eyebrow">Evidence-linked strategy</p>
-        <h2 id="angle-picker-heading">Choose your angle</h2>
+        <h2 id="angle-picker-heading" ref={angleHeading} tabIndex={-1}>
+          Choose your angle
+        </h2>
       </header>
       {notice ? (
         <p className="research-notice" role="alert">
@@ -298,16 +315,25 @@ export function AnglePicker({
             confirmRegenerate ? (
               <div
                 className="angle-regenerate-warning"
+                onKeyDown={(event) => {
+                  if (event.key === "Escape" && !working) cancelRegeneration();
+                }}
                 role="alertdialog"
                 aria-labelledby="regenerate-heading"
               >
-                <h3 id="regenerate-heading">Use your one regeneration?</h3>
+                <h3
+                  id="regenerate-heading"
+                  ref={regenerateHeading}
+                  tabIndex={-1}
+                >
+                  Use your one regeneration?
+                </h3>
                 <p>This permanently replaces all three current strategies.</p>
                 <div className="angle-card-actions">
                   <button
                     className="button button-secondary"
                     disabled={working}
-                    onClick={() => setConfirmRegenerate(false)}
+                    onClick={cancelRegeneration}
                     type="button"
                   >
                     Keep these angles
@@ -326,6 +352,7 @@ export function AnglePicker({
               <button
                 className="button button-secondary angle-regenerate-button"
                 onClick={() => setConfirmRegenerate(true)}
+                ref={regenerateButton}
                 type="button"
               >
                 Regenerate once

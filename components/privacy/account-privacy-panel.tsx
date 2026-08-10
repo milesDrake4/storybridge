@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { AsyncStatus } from "@/components/ui/async-status";
+import { ErrorSummary } from "@/components/ui/error-summary";
 import type {
   AccountDeletionStatusResponse,
   DeletionRequest,
@@ -147,15 +149,9 @@ export function AccountPrivacyPanel() {
             </button>
           </div>
         )}
-        {status ? (
-          <p className="form-status" role="status">
-            {status}
-          </p>
-        ) : null}
+        {status ? <AsyncStatus>{status}</AsyncStatus> : null}
         {error ? (
-          <p className="form-error" role="alert">
-            {error}
-          </p>
+          <ErrorSummary title="Deletion action failed">{error}</ErrorSummary>
         ) : null}
       </section>
     </div>
