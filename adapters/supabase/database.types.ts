@@ -216,6 +216,72 @@ export type Database = {
         };
         Relationships: [];
       };
+      checkout_sessions: {
+        Row: {
+          binding_id: string;
+          checkout_url: string | null;
+          created_at: string;
+          expected_amount_cents: number;
+          expected_currency: string;
+          expected_price_id: string;
+          idempotency_key_hmac: string;
+          mode: string;
+          provider_expires_at: string;
+          request_hmac: string;
+          season: string;
+          status: string;
+          stripe_charge_id: string | null;
+          stripe_checkout_session_id: string | null;
+          stripe_customer_id: string | null;
+          stripe_payment_intent_id: string | null;
+          updated_at: string;
+          user_binding_hmac: string;
+          user_id: string;
+        };
+        Insert: {
+          binding_id: string;
+          checkout_url?: string | null;
+          created_at?: string;
+          expected_amount_cents: number;
+          expected_currency: string;
+          expected_price_id: string;
+          idempotency_key_hmac: string;
+          mode: string;
+          provider_expires_at: string;
+          request_hmac: string;
+          season: string;
+          status?: string;
+          stripe_charge_id?: string | null;
+          stripe_checkout_session_id?: string | null;
+          stripe_customer_id?: string | null;
+          stripe_payment_intent_id?: string | null;
+          updated_at?: string;
+          user_binding_hmac: string;
+          user_id: string;
+        };
+        Update: {
+          binding_id?: string;
+          checkout_url?: string | null;
+          created_at?: string;
+          expected_amount_cents?: number;
+          expected_currency?: string;
+          expected_price_id?: string;
+          idempotency_key_hmac?: string;
+          mode?: string;
+          provider_expires_at?: string;
+          request_hmac?: string;
+          season?: string;
+          status?: string;
+          stripe_charge_id?: string | null;
+          stripe_checkout_session_id?: string | null;
+          stripe_customer_id?: string | null;
+          stripe_payment_intent_id?: string | null;
+          updated_at?: string;
+          user_binding_hmac?: string;
+          user_id?: string;
+        };
+        Relationships: [];
+      };
       entitlements: {
         Row: {
           created_at: string;
@@ -399,6 +465,34 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      finalize_checkout_session: {
+        Args: {
+          requested_at?: string;
+          requested_binding_id: string;
+          requested_checkout_url: string;
+          requested_expires_at: string;
+          requested_stripe_customer_id: string | null;
+          requested_stripe_session_id: string;
+        };
+        Returns: string;
+      };
+      reserve_checkout_session: {
+        Args: {
+          requested_amount_cents: number;
+          requested_at?: string;
+          requested_binding_id: string;
+          requested_currency: string;
+          requested_expires_at: string;
+          requested_idempotency_key_hmac: string;
+          requested_mode: string;
+          requested_price_id: string;
+          requested_request_hmac: string;
+          requested_season: string;
+          requested_user_binding_hmac: string;
+          requested_user_id: string;
+        };
+        Returns: Json;
+      };
       consume_auth_request_limit: {
         Args: {
           requested_at?: string;

@@ -6,8 +6,12 @@ import { useCallback, useEffect, useState } from "react";
 import { apiSuccessSchema } from "@/contracts/http/v1/envelopes";
 import { essayPageSchema, type EssaySummary } from "@/contracts/http/v1/essays";
 import type { Page } from "@/contracts/http/v1/common";
+import { SeasonPassPanel } from "@/components/billing/season-pass-panel";
 
-type Props = { initialPage?: Page<EssaySummary> };
+type Props = {
+  initialPage?: Page<EssaySummary>;
+  seasonPassPriceCents?: number;
+};
 
 async function responseJson(response: Response) {
   try {
@@ -17,7 +21,10 @@ async function responseJson(response: Response) {
   }
 }
 
-export function EssayDashboard({ initialPage }: Props) {
+export function EssayDashboard({
+  initialPage,
+  seasonPassPriceCents = 2_499,
+}: Props) {
   const [items, setItems] = useState(initialPage?.items ?? []);
   const [nextCursor, setNextCursor] = useState(initialPage?.nextCursor ?? null);
   const [loading, setLoading] = useState(initialPage === undefined);
@@ -92,6 +99,8 @@ export function EssayDashboard({ initialPage }: Props) {
           Set up an essay
         </Link>
       </header>
+
+      <SeasonPassPanel priceCents={seasonPassPriceCents} />
 
       {notice ? (
         <div className="essay-notice" role="alert">

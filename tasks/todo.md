@@ -66,7 +66,7 @@ Rule: Do not start a task until every dependency listed in the plan is complete.
 
 ## Slice 7: Billing and privacy
 
-- [ ] 34. Create idempotent Stripe Checkout sessions
+- [x] 34. Create idempotent Stripe Checkout sessions
 - [ ] 35. Fulfill and reverse entitlements from verified webhooks
 - [ ] 36. Apply paid allowance without bypassing atomic limits
 - [ ] 37. Deliver account data export and deletion
