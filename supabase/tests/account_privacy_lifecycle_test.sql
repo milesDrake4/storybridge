@@ -81,7 +81,7 @@ where user_id = 'ff200000-0000-4000-8000-000000000002';
 create temp table account_export as
 select private.get_account_export(
   'ff200000-0000-4000-8000-000000000001', 5242880,
-  '2026-08-10T17:59:00Z'
+  now() - interval '11 minutes'
 ) as result;
 select is(
   (select result ->> 'decision' from account_export),
@@ -105,7 +105,7 @@ select private.queue_account_deletion(
   'v1.' || repeat('a', 43),
   'v1.' || repeat('b', 43),
   'v1.' || repeat('c', 43),
-  '2026-08-10T18:00:00Z'
+  now() - interval '10 minutes'
 ) as result;
 
 select is(
@@ -124,7 +124,7 @@ select is(
   private.queue_account_deletion(
     'ff200000-0000-4000-8000-000000000001',
     'v1.' || repeat('a', 43), 'v1.' || repeat('b', 43),
-    'v1.' || repeat('c', 43), '2026-08-10T18:01:00Z'
+    'v1.' || repeat('c', 43), now() - interval '9 minutes'
   ) ->> 'decision',
   'REPLAY', 'the same deletion key replays atomically'
 );
@@ -132,31 +132,31 @@ select is(
   private.queue_account_deletion(
     'ff200000-0000-4000-8000-000000000001',
     'v1.' || repeat('a', 43), 'v1.' || repeat('d', 43),
-    'v1.' || repeat('e', 43), '2026-08-10T18:02:00Z'
+    'v1.' || repeat('e', 43), now() - interval '8 minutes'
   ) ->> 'decision',
   'CONFLICT', 'a second key cannot create a concurrent deletion'
 );
 select is(
   private.get_account_deletion_status(
-    'v1.' || repeat('b', 43), '2026-08-10T18:03:00Z'
+    'v1.' || repeat('b', 43), now() - interval '7 minutes'
   ) ->> 'status',
   'QUEUED', 'the bearer-token HMAC resolves only its queued status'
 );
 select is(
   private.get_account_deletion_status(
-    'v1.' || repeat('z', 43), '2026-08-10T18:03:00Z'
+    'v1.' || repeat('z', 43), now() - interval '7 minutes'
   ),
   null::jsonb, 'an unknown token reveals no deletion metadata'
 );
 select is(
   private.get_account_deletion_status(
-    'v1.' || repeat('b', 43), '2026-09-10T18:00:01Z'
+    'v1.' || repeat('b', 43), now() + interval '31 days'
   ),
   null::jsonb, 'an expired token reveals no deletion metadata'
 );
 
 create temp table claimed_deletion as
-select private.claim_next_account_deletion('2026-08-10T18:04:00Z') as result;
+select private.claim_next_account_deletion(now() - interval '6 minutes') as result;
 select is(
   (select result ->> 'status' from claimed_deletion),
   'PROCESSING', 'a worker atomically claims the oldest queued deletion'
@@ -166,13 +166,13 @@ select is(
   1, 'the worker records its provider attempt atomically with the claim'
 );
 select is(
-  private.claim_next_account_deletion('2026-08-10T18:04:01Z'),
+  private.claim_next_account_deletion(now() - interval '5 minutes'),
   null::jsonb, 'another worker cannot claim an in-flight deletion'
 );
 select is(
   private.complete_account_deletion(
     ((select result ->> 'deletion_id' from claimed_deletion))::uuid,
-    '2026-08-10T18:05:00Z'
+    now() - interval '4 minutes'
   ),
   false, 'completion is rejected until provider deletion clears the raw user ID'
 );
@@ -204,13 +204,13 @@ select is(
 select is(
   private.complete_account_deletion(
     ((select result ->> 'deletion_id' from claimed_deletion))::uuid,
-    '2026-08-10T18:05:00Z'
+    now() - interval '4 minutes'
   ),
   true, 'the worker completes only after provider identity deletion'
 );
 select is(
   private.get_account_deletion_status(
-    'v1.' || repeat('b', 43), '2026-08-10T18:06:00Z'
+    'v1.' || repeat('b', 43), now() - interval '3 minutes'
   ) ->> 'status',
   'COMPLETE', 'the scoped status reports completion'
 );

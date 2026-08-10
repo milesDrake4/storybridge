@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { source } from "axe-core";
+import axeCore from "axe-core";
 
 type AxeViolation = {
   id: string;
@@ -8,7 +8,7 @@ type AxeViolation = {
 };
 
 async function expectNoSeriousAxeViolations(page: Page) {
-  await page.addScriptTag({ content: source });
+  await page.addScriptTag({ content: axeCore.source });
   const violations = await page.evaluate(async () => {
     const axe = (
       window as unknown as {
