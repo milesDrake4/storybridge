@@ -32,7 +32,7 @@ const envelope = (data: unknown) => ({
 test("downloads private data and preserves one-time deletion status access", async ({
   page,
 }) => {
-  await page.route("**/api/v1/me/export**", (route) =>
+  await page.route(/\/api\/v1\/me\/export(?:\?.*)?$/, (route) =>
     route.fulfill({
       body: JSON.stringify({
         data: { essays: [] },
@@ -41,10 +41,10 @@ test("downloads private data and preserves one-time deletion status access", asy
         schemaVersion: "2026-08-10",
       }),
       headers: {
-        "content-disposition":
+        "Content-Disposition":
           'attachment; filename="storybridge-data-2026-08-10.json"',
-        "content-type": "application/json",
       },
+      contentType: "application/json",
     }),
   );
   await page.route("**/api/v1/me", async (route) => {
