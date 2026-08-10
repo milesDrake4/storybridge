@@ -14,6 +14,6 @@ export async function POST(request: Request): Promise<Response> {
   };
   return createAccountDeletionWorkerHandler({
     processNext: () => processNextAccountDeletion(dependencies),
-    secret: config.accountDeletionWorkerSecret,
+    secret: config.internalOperationsSecret,
   })(request);
 }

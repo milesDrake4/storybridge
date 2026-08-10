@@ -2,7 +2,10 @@ import { timingSafeEqual } from "node:crypto";
 
 import type { AccountDeletionWorkerResult } from "@/services/privacy/process-account-deletion";
 
-function authorized(request: Request, secret: string): boolean {
+export function authorizedInternalRequest(
+  request: Request,
+  secret: string,
+): boolean {
   const authorization = request.headers.get("authorization");
   const expected = `Bearer ${secret}`;
   if (!authorization || authorization.length !== expected.length) return false;
@@ -20,7 +23,7 @@ export function createAccountDeletionWorkerHandler(dependencies: {
         status: 503,
       });
     }
-    if (!authorized(request, dependencies.secret)) {
+    if (!authorizedInternalRequest(request, dependencies.secret)) {
       return new Response(null, {
         headers: { "cache-control": "no-store" },
         status: 401,
