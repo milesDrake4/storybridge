@@ -116,6 +116,21 @@ export function createSdkOpenAiTransport(apiKey: string): OpenAiTransport {
   };
 }
 
+export function createConfiguredOpenAiTransport(
+  config: ServerConfig,
+): OpenAiTransport {
+  if (config.aiProviderMode === "live") {
+    return createSdkOpenAiTransport(config.openAiApiKey);
+  }
+  const unavailable = async (): Promise<never> => {
+    throw new AiAdapterError("SERVICE_UNAVAILABLE");
+  };
+  return {
+    createModeration: unavailable,
+    createResponse: unavailable,
+  };
+}
+
 export function createOpenAiAdapters(
   config: OpenAiAdapterConfig,
   transport: OpenAiTransport,
@@ -174,7 +189,7 @@ export function createConfiguredOpenAiAdapters(config: ServerConfig) {
       maxOutputTokens: config.maxAiOutputTokens,
       model: config.openAiModel,
     },
-    createSdkOpenAiTransport(config.openAiApiKey),
+    createConfiguredOpenAiTransport(config),
   );
 }
 
