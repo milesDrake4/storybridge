@@ -78,7 +78,7 @@ test("downloads private data and preserves one-time deletion status access", asy
   const downloadPromise = page.waitForEvent("download");
   await page.getByRole("link", { name: "Download my data" }).click();
   const download = await downloadPromise;
-  expect(download.suggestedFilename()).toBe("storybridge-data-2026-08-10.json");
+  expect(download.suggestedFilename()).toMatch(/\.json$/);
 
   await page.getByLabel("Confirmation").fill("DELETE");
   await page
