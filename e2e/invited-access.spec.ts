@@ -80,7 +80,11 @@ test("requires a user action before consuming an emailed sign-in link", async ({
   let requestedProviderUrl = "";
   await page.route(`${providerUrl}/auth/v1/verify**`, async (route) => {
     requestedProviderUrl = route.request().url();
-    await route.fulfill({ body: "Sign-in verifier reached", status: 200 });
+    await route.fulfill({
+      body: "<main>Sign-in verifier reached</main>",
+      contentType: "text/html",
+      status: 200,
+    });
   });
 
   await page.goto(
