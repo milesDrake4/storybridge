@@ -87,7 +87,8 @@ test("requires a user action before consuming an emailed sign-in link", async ({
     const request = route.request();
     expect(request.method()).toBe("POST");
     submittedConfirmationUrl =
-      new URLSearchParams(request.postData() ?? "").get("confirmationUrl") ?? "";
+      new URLSearchParams(request.postData() ?? "").get("confirmationUrl") ??
+      "";
     await route.fulfill({ status: 204 });
   });
 
