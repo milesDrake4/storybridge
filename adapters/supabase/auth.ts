@@ -2,7 +2,6 @@ import type { CookieMethodsServer } from "@supabase/ssr";
 import { z } from "zod";
 
 import {
-  createSupabasePublicClient,
   createSupabaseSecretClient,
   createSupabaseSessionClient,
 } from "@/adapters/supabase/client";
@@ -37,8 +36,9 @@ const authIdentitySchema = z.object({
 
 export function createSupabaseMagicLinkDependencies(
   config: ServerConfig,
+  cookies: CookieMethodsServer,
 ): RequestMagicLinkDependencies {
-  const publicClient = createSupabasePublicClient(config);
+  const sessionClient = createSupabaseSessionClient(config, cookies);
   const secretClient = createSupabaseSecretClient(config);
 
   async function consume(
@@ -88,7 +88,7 @@ export function createSupabaseMagicLinkDependencies(
     rateLimit,
     sender: {
       async send({ email, redirectTo, shouldCreateUser }) {
-        const { error } = await publicClient.auth.signInWithOtp({
+        const { error } = await sessionClient.auth.signInWithOtp({
           email,
           options: { emailRedirectTo: redirectTo, shouldCreateUser },
         });

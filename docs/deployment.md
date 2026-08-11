@@ -38,6 +38,31 @@ Production scope:
 - `BETA_ACCOUNT_CAP=25` and `MONTHLY_OPENAI_BUDGET_CENTS=15000`
 - independently generated production HMAC and internal-operations secrets
 
+## Scanner-resistant authentication email
+
+Production and preview must not email Supabase's one-time confirmation URL
+directly. Email security scanners can open that URL before the recipient and
+consume it. In **Authentication > Email Templates > Magic Link**, use this
+template so an automated `GET` only opens StoryBridge's confirmation page; the
+Supabase verifier is reached only after the recipient explicitly submits the
+confirmation form:
+
+```html
+<h2>Your StoryBridge sign-in link</h2>
+<p>Open StoryBridge, then confirm that you want to sign in.</p>
+<p>
+  <a href="{{ .SiteURL }}/confirm-sign-in?confirmation_url={{ .ConfirmationURL }}">
+    Continue to StoryBridge
+  </a>
+</p>
+<p>This one-time link expires shortly. If you did not request it, ignore this email.</p>
+```
+
+Set the Supabase Site URL to the corresponding application origin and allow the
+exact `/api/v1/auth/callback` redirect URL. Keep provider link tracking disabled.
+The application validates the Supabase verification origin, path, magic-link
+type, and callback destination again before issuing the user-initiated redirect.
+
 Run `node scripts/validate-deployment-environment.mjs` in the deployment platform before a preview or production promotion. The script reports field names and policy failures only; it never prints values.
 
 ## Pull-request gates

@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+import { discoverLocalSupabaseEnvironment } from "./support/local-supabase";
+
+const appUrl = "http://127.0.0.1:3100";
+
+function supabaseUrl(): string {
+  try {
+    return discoverLocalSupabaseEnvironment().supabaseUrl;
+  } catch {
+    return "https://test.supabase.co";
+  }
+}
+
 test("requests an invited sign-in link with fixed, responsive UI", async ({
   page,
 }) => {
@@ -54,6 +66,34 @@ test("recovers from callback failure without exposing provider details", async (
       .filter({ hasText: "That sign-in link could not be used" }),
   ).toHaveText("That sign-in link could not be used. Request a new one below.");
   await expect(page.getByText(/private-diagnostic/i)).toHaveCount(0);
+});
+
+test("requires a user action before consuming an emailed sign-in link", async ({
+  page,
+}) => {
+  const providerUrl = supabaseUrl();
+  const confirmationUrl = `${providerUrl}/auth/v1/verify?${new URLSearchParams({
+    redirect_to: `${appUrl}/api/v1/auth/callback`,
+    token: "synthetic-token-hash",
+    type: "magiclink",
+  })}`;
+  let requestedProviderUrl = "";
+  await page.route(`${providerUrl}/auth/v1/verify**`, async (route) => {
+    requestedProviderUrl = route.request().url();
+    await route.fulfill({ body: "Sign-in verifier reached", status: 200 });
+  });
+
+  await page.goto(
+    `/confirm-sign-in?confirmation_url=${encodeURIComponent(confirmationUrl)}`,
+  );
+  await expect(
+    page.getByRole("button", { name: "Confirm sign in" }),
+  ).toBeVisible();
+  expect(requestedProviderUrl).toBe("");
+
+  await page.getByRole("button", { name: "Confirm sign in" }).click();
+  await expect(page.getByText("Sign-in verifier reached")).toBeVisible();
+  expect(requestedProviderUrl).toBe(confirmationUrl);
 });
 
 test("records adult consent and continues to the dashboard", async ({
