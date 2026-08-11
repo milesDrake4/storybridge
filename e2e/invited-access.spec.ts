@@ -78,13 +78,17 @@ test("requires a user action before consuming an emailed sign-in link", async ({
     type: "magiclink",
   })}`;
   let requestedProviderUrl = "";
+  let submittedConfirmationUrl = "";
   await page.route(`${providerUrl}/auth/v1/verify**`, async (route) => {
     requestedProviderUrl = route.request().url();
-    await route.fulfill({
-      body: "<main>Sign-in verifier reached</main>",
-      contentType: "text/html",
-      status: 200,
-    });
+    await route.fulfill({ body: "Unexpected verifier request", status: 500 });
+  });
+  await page.route("**/api/v1/auth/confirm", async (route) => {
+    const request = route.request();
+    expect(request.method()).toBe("POST");
+    submittedConfirmationUrl =
+      new URLSearchParams(request.postData() ?? "").get("confirmationUrl") ?? "";
+    await route.fulfill({ status: 204 });
   });
 
   await page.goto(
@@ -94,9 +98,11 @@ test("requires a user action before consuming an emailed sign-in link", async ({
     page.getByRole("button", { name: "Confirm sign in" }),
   ).toBeVisible();
   expect(requestedProviderUrl).toBe("");
+  expect(submittedConfirmationUrl).toBe("");
 
   await page.getByRole("button", { name: "Confirm sign in" }).click();
-  await expect.poll(() => requestedProviderUrl).toBe(confirmationUrl);
+  await expect.poll(() => submittedConfirmationUrl).toBe(confirmationUrl);
+  expect(requestedProviderUrl).toBe("");
 });
 
 test("records adult consent and continues to the dashboard", async ({
