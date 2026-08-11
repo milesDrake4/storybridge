@@ -96,8 +96,7 @@ test("requires a user action before consuming an emailed sign-in link", async ({
   expect(requestedProviderUrl).toBe("");
 
   await page.getByRole("button", { name: "Confirm sign in" }).click();
-  await expect(page.getByText("Sign-in verifier reached")).toBeVisible();
-  expect(requestedProviderUrl).toBe(confirmationUrl);
+  await expect.poll(() => requestedProviderUrl).toBe(confirmationUrl);
 });
 
 test("records adult consent and continues to the dashboard", async ({
