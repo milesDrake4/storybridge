@@ -1,5 +1,17 @@
 import { expect, test } from "@playwright/test";
 
+import { discoverLocalSupabaseEnvironment } from "./support/local-supabase";
+
+const appUrl = "http://127.0.0.1:3100";
+
+function supabaseUrl(): string {
+  try {
+    return discoverLocalSupabaseEnvironment().supabaseUrl;
+  } catch {
+    return "https://test.supabase.co";
+  }
+}
+
 test("requests an invited sign-in link with fixed, responsive UI", async ({
   page,
 }) => {
@@ -54,6 +66,44 @@ test("recovers from callback failure without exposing provider details", async (
       .filter({ hasText: "That sign-in link could not be used" }),
   ).toHaveText("That sign-in link could not be used. Request a new one below.");
   await expect(page.getByText(/private-diagnostic/i)).toHaveCount(0);
+});
+
+test("requires a user action before consuming an emailed sign-in link", async ({
+  page,
+}) => {
+  const providerUrl = supabaseUrl();
+  const confirmationUrl = `${providerUrl}/auth/v1/verify?${new URLSearchParams({
+    redirect_to: `${appUrl}/api/v1/auth/callback`,
+    token: "synthetic-token-hash",
+    type: "magiclink",
+  })}`;
+  let requestedProviderUrl = "";
+  let submittedConfirmationUrl = "";
+  await page.route(`${providerUrl}/auth/v1/verify**`, async (route) => {
+    requestedProviderUrl = route.request().url();
+    await route.fulfill({ body: "Unexpected verifier request", status: 500 });
+  });
+  await page.route("**/api/v1/auth/confirm", async (route) => {
+    const request = route.request();
+    expect(request.method()).toBe("POST");
+    submittedConfirmationUrl =
+      new URLSearchParams(request.postData() ?? "").get("confirmationUrl") ??
+      "";
+    await route.fulfill({ status: 204 });
+  });
+
+  await page.goto(
+    `/confirm-sign-in?confirmation_url=${encodeURIComponent(confirmationUrl)}`,
+  );
+  await expect(
+    page.getByRole("button", { name: "Confirm sign in" }),
+  ).toBeVisible();
+  expect(requestedProviderUrl).toBe("");
+  expect(submittedConfirmationUrl).toBe("");
+
+  await page.getByRole("button", { name: "Confirm sign in" }).click();
+  await expect.poll(() => submittedConfirmationUrl).toBe(confirmationUrl);
+  expect(requestedProviderUrl).toBe("");
 });
 
 test("records adult consent and continues to the dashboard", async ({

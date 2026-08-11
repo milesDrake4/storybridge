@@ -101,6 +101,9 @@ notification recipient, reviewer/date: **_________________________________**
 - [ ] Direct API checks reject missing/invalid invitation, under-18 consent,
       stale policy consent, cross-user access, invalid idempotency, and unsigned,
       stale, test-mode, or field-mismatched Stripe events.
+- [ ] The production Magic Link email uses the scanner-resistant template in
+      `docs/deployment.md`; opening the emailed URL does not contact Supabase's
+      verifier until the recipient submits **Confirm sign in**.
 - [ ] No production secret appears in browser source maps, client chunks,
       network responses, analytics, logs, or repository history.
 - [ ] Application rollback to the previous deployment and invitation shutdown

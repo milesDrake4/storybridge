@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from "vitest";
+import type { CookieOptions } from "@supabase/ssr";
 
+import { createSupabaseMagicLinkDependencies } from "@/adapters/supabase/auth";
 import { supabaseAuthCookieOptions } from "@/adapters/supabase/client";
 import { createAuthCallbackGetHandler } from "@/app/api/v1/auth/callback/handler";
+import { createAuthConfirmationPostHandler } from "@/app/api/v1/auth/confirm/handler";
 import { createMagicLinkPostHandler } from "@/app/api/v1/auth/magic-links/handler";
 import {
   apiErrorSchema,
@@ -9,6 +12,7 @@ import {
 } from "@/contracts/http/v1/envelopes";
 import { magicLinkAcceptedSchema } from "@/contracts/http/v1/auth";
 import type { HmacSecrets } from "@/lib/config/server";
+import type { ServerConfig } from "@/lib/config/server";
 import type {
   EmailHmac,
   InvitationTokenHmac,
@@ -52,6 +56,14 @@ const hmacSecrets = {
   idempotency: "identity-secret-that-is-at-least-32-bytes-long",
   ip: "ip-address-secret-that-is-at-least-32-bytes-long",
 } satisfies HmacSecrets;
+
+const supabaseConfig = {
+  appUrl,
+  hmacSecrets,
+  supabasePublishableKey: "example-publishable-key",
+  supabaseSecretKey: "example-server-key",
+  supabaseUrl: new URL("https://supabase.storybridge.test"),
+} as ServerConfig;
 
 describe("requestMagicLink", () => {
   it("returns the same accepted result when the provider accepts or rejects", async () => {
@@ -127,6 +139,57 @@ describe("Supabase auth cookies", () => {
       sameSite: "lax",
       secure: true,
     });
+  });
+
+  it("starts email links with a cookie-backed PKCE challenge", async () => {
+    const cookiesToSet: Array<{
+      name: string;
+      options: CookieOptions;
+      value: string;
+    }> = [];
+    let requestBody: Record<string, unknown> = {};
+    const fetchMock = vi.fn(
+      async (input: RequestInfo | URL, init?: RequestInit) => {
+        void input;
+        requestBody = JSON.parse(String(init?.body)) as Record<string, unknown>;
+        return new Response("{}", {
+          headers: { "content-type": "application/json" },
+          status: 200,
+        });
+      },
+    );
+    vi.stubGlobal("fetch", fetchMock);
+
+    const dependencies = createSupabaseMagicLinkDependencies(supabaseConfig, {
+      getAll: () => [],
+      setAll: (values) => {
+        cookiesToSet.push(...values);
+      },
+    });
+    await dependencies.sender.send({
+      email: "student@example.com",
+      redirectTo: "https://storybridge.test/api/v1/auth/callback",
+      shouldCreateUser: true,
+    });
+
+    expect(requestBody).toMatchObject({
+      code_challenge_method: "s256",
+      create_user: true,
+      email: "student@example.com",
+    });
+    expect(requestBody.code_challenge).toEqual(expect.any(String));
+    expect(cookiesToSet).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          name: expect.stringMatching(/-code-verifier(?:\.|$)/),
+          options: expect.objectContaining({
+            httpOnly: true,
+            sameSite: "lax",
+            secure: true,
+          }),
+        }),
+      ]),
+    );
   });
 });
 
@@ -328,5 +391,47 @@ describe("GET /api/v1/auth/callback", () => {
       "https://storybridge.test/sign-in?error=AUTH_CALLBACK_FAILED",
     );
     expect(exchange).not.toHaveBeenCalled();
+  });
+});
+
+describe("POST /api/v1/auth/confirm", () => {
+  it("redirects a same-origin form submission to the trusted Supabase verifier", async () => {
+    const confirmationUrl =
+      "https://supabase.storybridge.test/auth/v1/verify?token=token-hash&type=magiclink&redirect_to=https%3A%2F%2Fstorybridge.test%2Fapi%2Fv1%2Fauth%2Fcallback";
+    const response = await createAuthConfirmationPostHandler({
+      appUrl,
+      supabaseUrl: supabaseConfig.supabaseUrl,
+    })(
+      new Request("https://storybridge.test/api/v1/auth/confirm", {
+        body: new URLSearchParams({ confirmationUrl }),
+        headers: { origin: appUrl.origin },
+        method: "POST",
+      }),
+    );
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(confirmationUrl);
+    expect(response.headers.get("cache-control")).toBe("private, no-store");
+  });
+
+  it("rejects cross-origin form submissions without exposing their target", async () => {
+    const response = await createAuthConfirmationPostHandler({
+      appUrl,
+      supabaseUrl: supabaseConfig.supabaseUrl,
+    })(
+      new Request("https://storybridge.test/api/v1/auth/confirm", {
+        body: new URLSearchParams({
+          confirmationUrl:
+            "https://evil.test/auth/v1/verify?token=stolen&type=magiclink",
+        }),
+        headers: { origin: "https://evil.test" },
+        method: "POST",
+      }),
+    );
+
+    expect(response.status).toBe(303);
+    expect(response.headers.get("location")).toBe(
+      "https://storybridge.test/sign-in?error=AUTH_CALLBACK_FAILED",
+    );
   });
 });
