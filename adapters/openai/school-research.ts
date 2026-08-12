@@ -198,7 +198,9 @@ export function createSchoolResearchAdapter(
                 type: "json_schema",
               },
             },
-            tool_choice: "required",
+            // Hosted web search defaults to automatic tool selection. Some
+            // model/tool combinations reject a forced choice before searching.
+            // https://platform.openai.com/docs/api-reference/responses/create#responses-create-tool_choice
             tools: [
               {
                 filters: { allowed_domains: [school.officialDomain] },

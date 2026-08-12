@@ -38,7 +38,6 @@ export type OpenAiResponseRequest = {
       type: "json_schema";
     };
   };
-  tool_choice?: "required";
   tools?: Array<{
     filters: { allowed_domains: string[] };
     search_context_size?: "low" | "medium" | "high";

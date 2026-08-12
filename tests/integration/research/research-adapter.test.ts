@@ -106,7 +106,6 @@ describe("school research adapter", () => {
     const request = setup.createResponse.mock.calls[0]?.[0];
     expect(request).toMatchObject({
       store: false,
-      tool_choice: "required",
       tools: [
         {
           filters: { allowed_domains: ["example.edu"] },
@@ -114,6 +113,7 @@ describe("school research adapter", () => {
         },
       ],
     });
+    expect(request).not.toHaveProperty("tool_choice");
   });
 
   it("rejects an off-domain final redirect", async () => {
@@ -143,6 +143,26 @@ describe("school research adapter", () => {
     webCall.action.sources = [
       { type: "url", url: "https://example.edu/different-source" },
     ];
+    setup.createResponse.mockResolvedValue(providerResponse);
+
+    await expect(
+      setup.adapter.research({ school, userId }),
+    ).rejects.toMatchObject({
+      code: "PROVIDER_INVALID_RESPONSE",
+    });
+  });
+
+  it("rejects a response when the model did not use web search", async () => {
+    const fixture = {
+      schemaVersion: "1",
+      sources: [validSource],
+      summary: "Summary",
+    };
+    const setup = adapter(fixture);
+    const providerResponse = response(fixture);
+    providerResponse.output = providerResponse.output.filter(
+      (item) => item.type !== "web_search_call",
+    );
     setup.createResponse.mockResolvedValue(providerResponse);
 
     await expect(
